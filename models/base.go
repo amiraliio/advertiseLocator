@@ -4,6 +4,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+//Base model
 type Base struct {
 	ID        primitive.ObjectID `json:"_id"`
 	Status    string             `json:"status"`
