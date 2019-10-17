@@ -1,2 +1,0 @@
-# Advertise Locator
-
