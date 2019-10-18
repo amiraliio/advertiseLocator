@@ -1,1 +1,7 @@
 package repositories
+
+
+
+func Insert(){
+
+}

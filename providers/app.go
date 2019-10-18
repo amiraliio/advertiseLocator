@@ -9,4 +9,9 @@ import (
 func Start() {
 	configs.Init()
 	routes.Init()
+	register()
+}
+
+func register() {
+	//do what you want in startup in this method
 }

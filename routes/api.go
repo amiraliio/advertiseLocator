@@ -7,10 +7,10 @@ import (
 )
 
 var (
-	apiGroup     *echo.Group = configs.Server.Group("/api/v1")
-	authAPIGroup *echo.Group = apiGroup.Group("/auth")
+	apiV1 *echo.Group = configs.Server.Group("/api/v1")
+	auth  *echo.Group = apiV1.Group("/auth")
 )
 
 func api() {
-	authAPIGroup.POST("auth/person/register", controllers.PersonRegister).Name = "auth-person-register"
+	auth.POST("/person-register", controllers.PersonRegister).Name = "auth-person-register"
 }
