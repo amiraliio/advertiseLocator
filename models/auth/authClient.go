@@ -8,11 +8,11 @@ import (
 type AuthClient struct {
 	BaseUser
 	ClientID         primitive.ObjectID `json:"clientID"`
-	Version          string             `json:"version"`
+	Version          string             `json:"Version"`
 	LastLogin        primitive.DateTime `json:"lastLogin"`
 	OSType           string             `json:"osType"`
 	OSVersion        string             `json:"osVersion"`
-	RefreshToken     string             `json:"OSVersion"`
+	RefreshToken     string             `json:"refreshToken"`
 	Token            string             `json:"token"`
 	VerificationCode string             `json:"verificationCode"`
 	ExpireDate       primitive.DateTime `json:"expireDate"`
