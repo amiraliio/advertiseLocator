@@ -7,7 +7,11 @@ import (
 //PersonCollection collection
 const PersonCollection string = "persons"
 
+//PersonUserType user type
+const PersonUserType string = "person"
 
+//AdminUserType user type
+const AdminUserType string = "admin"
 
 //BaseUser model
 type BaseUser struct {
@@ -22,11 +26,11 @@ type Person struct {
 	BaseUser
 	Location  Location `json:"location"`
 	Avatar    Image    `json:"avatar"`
-	FirstName string   `json:"firstName"`
-	LastName  string   `json:"LastName"`
-	CellPhone string   `json:"cellPhone"`
-	Email     string   `json:"email"`
-	Radius    uint16   `json:"radius"`
+	FirstName string    `json:"firstName"`
+	LastName  string    `json:"LastName"`
+	CellPhone string    `json:"cellPhone"`
+	Email     string    `json:"email"`
+	Radius    uint16    `json:"radius"`
 }
 
 //Admin model

@@ -1,6 +1,6 @@
 # Advertise Locator
 
-I use this structure when I wanna creating a project in Go with a framework
+<!-- I use this structure when I wanna creating a project in Go with a framework
 
 - Framework: Echo
 
@@ -10,4 +10,4 @@ I hope the Go team add generic, you can figure out why I need that in this proje
 
 If do you have any suggestion for better structure, please feel free to send PR
 
-updating...
+updating... -->

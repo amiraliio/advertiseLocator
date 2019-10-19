@@ -10,10 +10,13 @@ type AuthRepository interface {
 	PersonRegister(person *models.Person, auth *models.Auth, client *models.AuthClient) (*models.Person, error)
 }
 
+//AuthService repository
+type AuthService struct{}
+
 //PersonRegister method
-func PersonRegister(person *models.Person, auth *models.Auth, client *models.AuthClient) (*models.Person, error) {
+func (service *AuthService) PersonRegister(person *models.Person, auth *models.Auth, client *models.AuthClient) (*models.Person, error) {
 	//insert person
-	personID, err := helpers.Mongo().InsertOne(models.PersonCollection, person)
+	_, err := helpers.Mongo().InsertOne(models.PersonCollection, person)
 	if err != nil {
 		return nil, err
 	}
@@ -27,6 +30,5 @@ func PersonRegister(person *models.Person, auth *models.Auth, client *models.Aut
 	if err != nil {
 		return nil, err
 	}
-	person.ID = personID
 	return person, nil
 }

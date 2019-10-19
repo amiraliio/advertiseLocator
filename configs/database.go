@@ -1,10 +1,11 @@
 package configs
 
 import (
+	"context"
 	"log"
 	"os"
+	"time"
 
-	"github.com/amiraliio/advertiselocator/helpers"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -16,7 +17,7 @@ func config() *mongo.Client {
 	} else {
 		config = "mongodb://" + os.Getenv("MONGO_HOST") + ":" + os.Getenv("MONGO_PORT")
 	}
-	context, _ := helpers.TimeOut(10)
+	context, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	client, err := mongo.Connect(context, options.Client().ApplyURI(config))
 	//TODO mongo defer close
 	if err != nil {

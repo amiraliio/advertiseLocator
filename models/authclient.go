@@ -19,8 +19,8 @@ type AuthClient struct {
 	Token            string             `json:"token"`
 	VerificationCode string             `json:"verificationCode"`
 	ExpireDate       primitive.DateTime `json:"expireDate"`
-	API              API                `json:"api"`
-	Auth             Auth               `json:"auth"`
+	API              API               `json:"api"`
+	Auth             Auth              `json:"auth"`
 }
 
 //API model
