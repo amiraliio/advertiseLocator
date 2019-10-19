@@ -18,6 +18,7 @@ func config() *mongo.Client {
 	}
 	context, _ := helpers.TimeOut(10)
 	client, err := mongo.Connect(context, options.Client().ApplyURI(config))
+	//TODO mongo defer close
 	if err != nil {
 		log.Println(err.Error())
 	}

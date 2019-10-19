@@ -1,5 +1,9 @@
 package models
 
+
+//AuthCollection collection
+const AuthCollection string = "auth"
+
 //Auth model
 type Auth struct {
 	BaseUser

@@ -4,6 +4,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+//ClientCollection const
+const ClientCollection string = "client"
+
 //AuthClient model
 type AuthClient struct {
 	BaseUser

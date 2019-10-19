@@ -4,6 +4,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+//PersonCollection collection
+const PersonCollection string = "persons"
+
+
+
 //BaseUser model
 type BaseUser struct {
 	Base
