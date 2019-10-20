@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/hex"
 	"net/http"
 	"time"
 
@@ -56,10 +57,6 @@ func PersonRegister(request echo.Context) (err error) {
 	client.UserID = personID
 	client.UserType = models.PersonUserType
 	client.IP = request.RealIP()
-	clientID, err = primitive.ObjectIDFromHex(registerRequest.Client.ID)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
 	client.ClientID = clientID
 	client.Version = registerRequest.Client.Version
 	client.LastLogin = primitive.NewDateTimeFromTime(time.Now())

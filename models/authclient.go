@@ -10,7 +10,7 @@ const ClientCollection string = "client"
 //AuthClient model
 type AuthClient struct {
 	BaseUser
-	ClientID         primitive.ObjectID `json:"clientID"`
+	ClientID         string `json:"clientID"`
 	Version          string             `json:"Version"`
 	LastLogin        primitive.DateTime `json:"lastLogin"`
 	OSType           string             `json:"osType"`
