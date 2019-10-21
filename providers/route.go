@@ -1,4 +1,4 @@
-package routes
+package providers
 
 import (
 	"encoding/json"
@@ -7,11 +7,12 @@ import (
 	"os"
 
 	"github.com/amiraliio/advertiselocator/configs"
+	"github.com/amiraliio/advertiselocator/routes"
 )
 
 //Init routes in the package main
-func Init() {
-	api()
+func initRoutes() {
+	routes.Api()
 	printRoutesToConsole()
 	configs.Server.Logger.Fatal(configs.Server.Start(":" + os.Getenv("SERVER_PORT")))
 }
