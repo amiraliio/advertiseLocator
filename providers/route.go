@@ -12,7 +12,7 @@ import (
 
 //Init routes in the package main
 func initRoutes() {
-	routes.Api()
+	routes.API()
 	printRoutesToConsole()
 	configs.Server.Logger.Fatal(configs.Server.Start(":" + os.Getenv("SERVER_PORT")))
 }

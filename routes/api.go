@@ -11,6 +11,7 @@ var (
 	auth  *echo.Group = apiV1.Group("/auth")
 )
 
-func Api() {
+//API routes
+func API() {
 	auth.POST("/person-register", controllers.PersonRegister).Name = "auth-person-register"
 }
