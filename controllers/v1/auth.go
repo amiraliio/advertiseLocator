@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"net/http"
 	"time"
 
@@ -67,19 +66,7 @@ func PersonRegister(request echo.Context) (err error) {
 	client.VerificationCode = "" //TODO
 	//TODO other client fields
 
-
-	//TODO move this mapping to helpers
-	data, err := json.Marshal(person)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-	newPerson := new(models.Person)
-	if err = json.Unmarshal(data, newPerson); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-
-
-	result, err := authRepository().PersonRegister(newPerson, auth, client)
+	result, err := authRepository().PersonRegister(person, auth, client)
 	//TODO BaseResponse
 	//return status code from repo
 	if err != nil {

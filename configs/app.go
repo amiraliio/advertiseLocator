@@ -5,20 +5,19 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	validator "gopkg.in/go-playground/validator.v9"
 )
+
+//Init configs in the package main
+func Init() {
+	//set your initial config
+}
 
 var (
 	//Server variable to use framework instance in the other packages
 	Server *echo.Echo = framework()
 )
-
-//Init configs in the package main
-func Init() {
-	environmentConfigs()
-}
 
 //instantiate framework
 func framework() *echo.Echo {
@@ -32,12 +31,4 @@ func framework() *echo.Echo {
 	}
 	framework.Debug = debug
 	return framework
-}
-
-//load environment variables from .env files
-func environmentConfigs() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println(err)
-	}
 }

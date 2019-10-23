@@ -21,7 +21,7 @@ func initRoutes() {
 func printRoutesToConsole() {
 	routes, err := json.MarshalIndent(configs.Server.Routes(), "", "  ")
 	if err != nil {
-		log.Println(err.Error())
+		log.Println(err.Error()) //TODO use echo logger
 	}
 	fmt.Println(string(routes))
 }

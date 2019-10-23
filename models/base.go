@@ -6,10 +6,10 @@ import (
 
 //Base model
 type Base struct {
-	ID        primitive.ObjectID `json:"_id"`
-	Status    string             `json:"status"`
-	CreatedAt primitive.DateTime `json:"createdAt"`
-	CreatedBy primitive.ObjectID `json:"createdBy"`
-	UpdatedAt primitive.DateTime `json:"updatedAt"`
-	UpdatedBy primitive.ObjectID `json:"updatedBy"`
+	ID        primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	Status    string             `json:"status" bson:"status"`
+	CreatedAt primitive.DateTime `json:"createdAt" bson:"createdAt"`
+	CreatedBy primitive.ObjectID `json:"createdBy" bson:"createdBy"`
+	UpdatedAt primitive.DateTime `json:"updatedAt" bson:"updatedAt"`
+	UpdatedBy primitive.ObjectID `json:"updatedBy" bson:"updatedBy"`
 }

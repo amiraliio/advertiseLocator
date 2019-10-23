@@ -1,12 +1,9 @@
 package providers
 
-import (
-	"github.com/amiraliio/advertiselocator/configs"
-)
+import 	_ "github.com/joho/godotenv/autoload" //_ autoload the config variables from .env file
 
 //Start application and initialize application assets
 func Start() {
-	configs.Init()
 	initRoutes()
 	register()
 }
