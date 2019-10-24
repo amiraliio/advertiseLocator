@@ -27,7 +27,7 @@ type Person struct {
 	Location  Location `json:"location"`
 	Avatar    Image    `json:"avatar"`
 	FirstName string    `json:"firstName"`
-	LastName  string    `json:"LastName"`
+	LastName  string    `json:"lastName"`
 	CellPhone string    `json:"cellPhone"`
 	Email     string    `json:"email"`
 	Radius    uint16    `json:"radius"`
