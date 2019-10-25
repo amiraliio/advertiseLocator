@@ -1,17 +1,18 @@
 package helpers
 
-import "encoding/json"
+import (
+	"go.mongodb.org/mongo-driver/bson"
+)
 
-//TODO use dynamic mapping
-
-//Mapper can map data
-func Mapper(object interface{}, model interface{}) (interface{}, error) {
-	data, err := json.Marshal(object)
+//Flatten can flat data models of embedded struct
+func Flatten(object interface{}) (interface{}, error) {
+	data, err := bson.Marshal(object)
 	if err != nil {
 		return nil, err
 	}
-	if err = json.Unmarshal(data, model); err != nil {
+	var entityModel map[string]interface{}
+	if err = bson.Unmarshal(data, &entityModel); err != nil {
 		return nil, err
 	}
-	return model, nil
+	return entityModel, nil
 }

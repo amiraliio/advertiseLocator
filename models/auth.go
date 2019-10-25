@@ -20,8 +20,8 @@ const TwitterAuthType string = "twitter"
 
 //Auth model
 type Auth struct {
-	BaseUser
-	Value    string `json:"value"`
-	Password string `json:"password"`
-	Type     string `json:"type"`
+	BaseUser ",inline"
+	Value    string `json:"value" bson:"value"`
+	Password string `json:"password" bson:"password"`
+	Type     string `json:"type" bson:"type"`
 }

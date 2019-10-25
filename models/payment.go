@@ -6,12 +6,12 @@ import (
 
 //Payment model
 type Payment struct {
-	Base
-	RefID         string             `json:"refID"`
-	Bank          string             `json:"bank"`
-	Amount        string             `json:"amount"`
-	Type          string             `json:"type"`
-	Date          primitive.DateTime `json:"date"`
-	OutputAccount string             `json:"outputAccount"`
-	InputAccount  string             `json:"InputAccount"`
+	Base          ",inline"
+	RefID         string             `json:"refID" bson:"refID"`
+	Bank          string             `json:"bank" bson:"bank"`
+	Amount        string             `json:"amount" bson:"amount"`
+	Type          string             `json:"type" bson:"type"`
+	Date          primitive.DateTime `json:"date" bson:"date"`
+	OutputAccount string             `json:"outputAccount" bson:"outputAccount"`
+	InputAccount  string             `json:"InputAccount" bson:"inputAccount"`
 }

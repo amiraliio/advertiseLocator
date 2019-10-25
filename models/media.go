@@ -2,32 +2,32 @@ package models
 
 //Media model
 type Media struct {
-	OriginalURL string `json:"originalURL"`
-	URL         string `json:"url"`
-	Type        string `json:"type"`
+	OriginalURL string `json:"originalURL" bson:"originalURL"`
+	URL         string `json:"url" bson:"url"`
+	Type        string `json:"type" bson:"type"`
 }
 
 //Image model
 type Image struct {
-	Media
-	Size string `json:"size"`
+	Media ",inline"
+	Size  string `json:"size" bson:"size"`
 }
 
 //Video model
 type Video struct {
-	Media
+	Media ",inline"
 }
 
 //File model
 type File struct {
-	Media
+	Media ",inline"
 }
 
 //AdvertiseImage model
 type AdvertiseImage struct {
-	Image
-	IsMain   bool   `json:"isMain"`
-	Caption  string `json:"caption"`
-	Show     bool   `json:"show"`
-	Priority byte   `json:"priority"`
+	Image    ",inline"
+	IsMain   bool   `json:"isMain" bson:"isMain"`
+	Caption  string `json:"caption" bson:"caption"`
+	Show     bool   `json:"show" bson:"show"`
+	Priority byte   `json:"priority" bson:"priority"`
 }

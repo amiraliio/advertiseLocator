@@ -24,7 +24,11 @@ type mongoService struct{}
 func (service *mongoService) InsertOne(collectionName string, object interface{}) (primitive.ObjectID, error) {
 	db := configs.DB().Collection(collectionName)
 	context, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	result, err := db.InsertOne(context, object)
+	entityModel, err := Flatten(object)
+	if err != nil {
+		return primitive.NilObjectID, err
+	}
+	result, err := db.InsertOne(context, entityModel)
 	if err != nil {
 		return primitive.NilObjectID, err
 	}

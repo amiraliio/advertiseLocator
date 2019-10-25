@@ -6,8 +6,8 @@ import (
 
 //Charge model
 type Charge struct {
-	Base
-	Title      string             `json:"title"`
-	Type       string             `json:"type"`
-	ExpireDate primitive.DateTime `json:"expireDate"`
+	Base       ",inline"
+	Title      string             `json:"title" bson:"title"`
+	Type       string             `json:"type" bson:"type"`
+	ExpireDate primitive.DateTime `json:"expireDate" bson:"expireDate"`
 }

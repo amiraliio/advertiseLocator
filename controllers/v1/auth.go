@@ -30,6 +30,8 @@ func PersonRegister(request echo.Context) (err error) {
 	person.Status = models.ActiveStatus
 	person.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	person.CreatedBy = personID
+	person.UpdatedBy = personID
+	person.UpdatedAt = primitive.NewDateTimeFromTime(time.Now())
 	person.UserType = models.PersonUserType
 	person.Email = registerRequest.Email
 	person.IP = request.RealIP()
@@ -40,6 +42,8 @@ func PersonRegister(request echo.Context) (err error) {
 	auth.Status = models.ActiveStatus
 	auth.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	auth.CreatedBy = personID
+	auth.UpdatedBy = personID
+	auth.UpdatedAt = primitive.NewDateTimeFromTime(time.Now())
 	auth.UserType = models.PersonUserType
 	auth.Value = registerRequest.Email
 	auth.IP = request.RealIP()
@@ -52,7 +56,9 @@ func PersonRegister(request echo.Context) (err error) {
 	client.ID = clientID
 	client.Status = models.ActiveStatus
 	client.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
-	client.CreatedBy = clientID
+	client.CreatedBy = personID
+	client.UpdatedBy = personID
+	client.UpdatedAt = primitive.NewDateTimeFromTime(time.Now())
 	client.UserID = personID
 	client.UserType = models.PersonUserType
 	client.IP = request.RealIP()
@@ -61,6 +67,11 @@ func PersonRegister(request echo.Context) (err error) {
 	client.LastLogin = primitive.NewDateTimeFromTime(time.Now())
 	client.OSType = registerRequest.Client.OsType
 	client.OSVersion = registerRequest.Client.OsVersion
+	client.API.Key = ""
+	client.API.Name = ""
+	client.API.ExpireDate = ""
+	client.API.Type = ""
+	client.API.Token = ""
 	client.RefreshToken = ""     //TODO refresh token
 	client.Token = ""            //TODO token
 	client.VerificationCode = "" //TODO
