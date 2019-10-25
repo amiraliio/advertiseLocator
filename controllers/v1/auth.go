@@ -70,7 +70,7 @@ func PersonRegister(request echo.Context) (err error) {
 	client.API.Key = ""
 	client.API.Name = ""
 	client.API.ExpireDate = ""
-	client.API.Type = ""
+	client.API.Type = models.InternalAPIKey
 	client.API.Token = ""
 	client.RefreshToken = ""     //TODO refresh token
 	client.Token = ""            //TODO token

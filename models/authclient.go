@@ -7,6 +7,15 @@ import (
 //ClientCollection const
 const ClientCollection string = "client"
 
+
+//APIKeyHeaderName const
+const APIKeyHeaderName string = "x-api-key"
+
+//InternalAPIKey const
+const InternalAPIKey string = "internal"
+//ExternalAPIKey const
+const ExternalAPIKey string = "external"
+
 //AuthClient model
 type AuthClient struct {
 	BaseUser         ",inline"
