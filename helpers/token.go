@@ -13,56 +13,53 @@ import (
 	"time"
 )
 
-//TODO create a interface for each helpers
+//Token interface
+type Token interface {
+	Encode(id, tokenType string) (*EncryptedToken, error)
+	Decode(token string) (*DecryptedToken, error)
+}
 
 const tokenSplitter string = "_"
 
 //EncryptedToken data model
 type EncryptedToken struct {
-	Token string
-	time  int64
+	Token string `json:"token"`
+	Time  int64  `json:"time"`
 }
 
 //DecryptedToken data model
 type DecryptedToken struct {
-	ID   string
-	Type string
-	Time int64
+	ID        string `json:"id"`
+	TokenType string `json:"tokenType"`
+	Time      int64  `json:"time"`
 }
 
-//GenerateToken helper
-func GenerateToken(id, tokenType string) (*EncryptedToken, error) {
+type tokenService struct{}
+
+//Encode encode
+func (tokenService *tokenService) Encode(id, tokenType string) (*EncryptedToken, error) {
 	time := time.Now().Unix()
-	init := id + tokenSplitter + tokenType + tokenSplitter + string(time)
-	token, err := encode(init)
-	if err != nil {
-		return nil, err
-	}
-	tokenModel := new(EncryptedToken)
-	tokenModel.Token = token
-	tokenModel.time = time
-	return tokenModel, nil
-}
-
-//token encode
-func encode(token string) (string, error) {
+	token := id + tokenSplitter + tokenType + tokenSplitter + string(time)
 	block, err := aes.NewCipher([]byte(os.Getenv("APP_KEY")))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	tokenInBase64 := base64.StdEncoding.EncodeToString([]byte(token))
 	cipherText := make([]byte, aes.BlockSize+len(tokenInBase64))
 	iv := cipherText[:aes.BlockSize] //identifier vector
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		return "", err
+		return nil, err
 	}
 	cfb := cipher.NewCFBEncrypter(block, iv)
 	cfb.XORKeyStream(cipherText[aes.BlockSize:], []byte(tokenInBase64))
-	return string(cipherText), nil
+	tokenModel := new(EncryptedToken)
+	tokenModel.Token = string(cipherText)
+	tokenModel.Time = time
+	return tokenModel, nil
 }
 
-//token decode
-func decode(token string) (*DecryptedToken, error) {
+//Decode decode
+func (tokenService *tokenService) Decode(token string) (*DecryptedToken, error) {
 	block, err := aes.NewCipher([]byte(os.Getenv("APP_KEY")))
 	if err != nil {
 		return nil, err
@@ -80,11 +77,11 @@ func decode(token string) (*DecryptedToken, error) {
 		return nil, err
 	}
 	token = string(data)
-	decryptedToken := new(DecryptedToken)
 	splittedToken := strings.Split(token, tokenSplitter)
 	if splittedToken != nil && len(splittedToken) == 3 {
+		decryptedToken := new(DecryptedToken)
 		decryptedToken.ID = splittedToken[0]
-		decryptedToken.Type = splittedToken[1]
+		decryptedToken.TokenType = splittedToken[1]
 		time, err := strconv.ParseInt(splittedToken[2], 10, 64)
 		if err != nil {
 			return nil, err
