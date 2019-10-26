@@ -1,8 +1,5 @@
 package models
 
-import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
-)
 
 //TODO order struct field from high to low field type size
 
@@ -15,13 +12,6 @@ const PersonUserType string = "person"
 //AdminUserType user type
 const AdminUserType string = "admin"
 
-//BaseUser model
-type BaseUser struct {
-	Base     ",inline"
-	UserID   primitive.ObjectID `json:"userID" bson:"userID"`
-	UserType string             `json:"userType" bson:"userType"`
-	IP       string             `json:"ip" bson:"ip"`
-}
 
 //Person model
 type Person struct {
