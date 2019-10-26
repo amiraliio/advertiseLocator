@@ -13,7 +13,7 @@ var (
 
 //API routes
 func API() {
-	apiV1.GET("x-api-key", controllers.GenerateXAPIKey).Name = "generate-x-api-key"
+	apiV1.POST("x-api-key", controllers.GenerateAPIKey).Name = "generate-x-api-key"
 
 	auth.POST("/person-register", controllers.PersonRegister).Name = "auth-person-register"
 }

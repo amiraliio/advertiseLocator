@@ -11,11 +11,13 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 //Token interface
 type Token interface {
-	Encode(id, tokenType string) (*EncryptedToken, error)
+	Encode(id, tokenType string, expireTime primitive.DateTime) (*EncryptedToken, error)
 	Decode(token string) (*DecryptedToken, error)
 }
 
@@ -23,22 +25,22 @@ const tokenSplitter string = "_"
 
 //EncryptedToken data model
 type EncryptedToken struct {
-	Token string `json:"token"`
-	Time  int64  `json:"time"`
+	Token      string             `json:"token"`
+	ExpireDate primitive.DateTime `json:"expireDate"`
 }
 
 //DecryptedToken data model
 type DecryptedToken struct {
-	ID        string `json:"id"`
-	TokenType string `json:"tokenType"`
-	Time      int64  `json:"time"`
+	ID         string             `json:"id"`
+	TokenType  string             `json:"tokenType"`
+	ExpireDate primitive.DateTime `json:"expireDate"`
 }
 
 type tokenService struct{}
 
 //Encode encode
-func (tokenService *tokenService) Encode(id, tokenType string) (*EncryptedToken, error) {
-	time := time.Now().Unix()
+func (tokenService *tokenService) Encode(id, tokenType string, expireTime primitive.DateTime) (*EncryptedToken, error) {
+	time := expireTime.Time().Unix()
 	token := id + tokenSplitter + tokenType + tokenSplitter + string(time)
 	block, err := aes.NewCipher([]byte(os.Getenv("APP_KEY")))
 	if err != nil {
@@ -54,7 +56,7 @@ func (tokenService *tokenService) Encode(id, tokenType string) (*EncryptedToken,
 	cfb.XORKeyStream(cipherText[aes.BlockSize:], []byte(tokenInBase64))
 	tokenModel := new(EncryptedToken)
 	tokenModel.Token = string(cipherText)
-	tokenModel.Time = time
+	tokenModel.ExpireDate = expireTime
 	return tokenModel, nil
 }
 
@@ -82,11 +84,11 @@ func (tokenService *tokenService) Decode(token string) (*DecryptedToken, error) 
 		decryptedToken := new(DecryptedToken)
 		decryptedToken.ID = splittedToken[0]
 		decryptedToken.TokenType = splittedToken[1]
-		time, err := strconv.ParseInt(splittedToken[2], 10, 64)
+		timestamp, err := strconv.ParseInt(splittedToken[2], 10, 64)
 		if err != nil {
 			return nil, err
 		}
-		decryptedToken.Time = time
+		decryptedToken.ExpireDate = primitive.NewDateTimeFromTime(time.Unix(timestamp, 0))
 		return decryptedToken, nil
 	}
 	return nil, errors.New("data of token is not right")

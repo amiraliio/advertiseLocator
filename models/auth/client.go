@@ -4,20 +4,13 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+//auth client model
+
 //ClientCollection const
 const ClientCollection string = "client"
 
-
-//APIKeyHeaderName const
-const APIKeyHeaderName string = "x-api-key"
-
-//InternalAPIKey const
-const InternalAPIKey string = "internal"
-//ExternalAPIKey const
-const ExternalAPIKey string = "external"
-
-//AuthClient model
-type AuthClient struct {
+//Client model
+type Client struct {
 	BaseUser         ",inline"
 	ClientID         string             `json:"clientID" bson:"clientID"`
 	Version          string             `json:"Version" bson:"version"`
@@ -30,13 +23,4 @@ type AuthClient struct {
 	ExpireDate       primitive.DateTime `json:"expireDate" bson:"expireDate"`
 	API              API                `json:"api" bson:"api"`
 	Auth             Auth               `json:"auth" bson:"auth"`
-}
-
-//API model
-type API struct {
-	Key        string             `json:"key" bson:"key"`
-	Name       string             `json:"name" bson:"name"`
-	ExpireDate primitive.DateTime `json:"expireDate" bson:"expireDate"`
-	Token      string             `json:"token" bson:"token"`
-	Type       string             `json:"type" bson:"type"`
 }

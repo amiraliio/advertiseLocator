@@ -7,14 +7,14 @@ import (
 
 //AuthRepository interface
 type AuthRepository interface {
-	PersonRegister(person *models.Person, auth *models.Auth, client *models.AuthClient) (*models.Person, error)
+	PersonRegister(person *models.Person, auth *models.Auth, client *models.Client) (*models.Person, error)
 }
 
 //AuthService repository
 type AuthService struct{}
 
 //PersonRegister method
-func (service *AuthService) PersonRegister(person *models.Person, auth *models.Auth, client *models.AuthClient) (*models.Person, error) {
+func (service *AuthService) PersonRegister(person *models.Person, auth *models.Auth, client *models.Client) (*models.Person, error) {
 	//insert person
 	_, err := helpers.Mongo().InsertOne(models.PersonCollection, person)
 	if err != nil {

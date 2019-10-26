@@ -51,7 +51,7 @@ func PersonRegister(request echo.Context) (err error) {
 	auth.Password = registerRequest.Password //TODO hash this shit
 	auth.Type = models.EmailAuthType
 
-	client := new(models.AuthClient)
+	client := new(models.Client)
 	clientID := primitive.NewObjectID()
 	client.ID = clientID
 	client.Status = models.ActiveStatus
