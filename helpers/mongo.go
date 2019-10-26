@@ -8,6 +8,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+//TODO improvement must be just interface not function
+
 //Mongo build
 func Mongo() MongoInterface {
 	return new(mongoService)

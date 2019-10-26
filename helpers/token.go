@@ -15,12 +15,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-//Token interface
-type Token interface {
-	Encode(id, tokenType string, expireTime primitive.DateTime) (*EncryptedToken, error)
-	Decode(token string) (*DecryptedToken, error)
-}
-
 const tokenSplitter string = "_"
 
 //EncryptedToken data model
@@ -36,11 +30,9 @@ type DecryptedToken struct {
 	ExpireDate primitive.DateTime `json:"expireDate"`
 }
 
-type tokenService struct{}
-
-//Encode encode
-func (tokenService *tokenService) Encode(id, tokenType string, expireTime primitive.DateTime) (*EncryptedToken, error) {
-	time := expireTime.Time().Unix()
+//EncodeToken encode
+func EncodeToken(id, tokenType string, expireDate primitive.DateTime) (*EncryptedToken, error) {
+	time := expireDate.Time().Unix()
 	token := id + tokenSplitter + tokenType + tokenSplitter + string(time)
 	block, err := aes.NewCipher([]byte(os.Getenv("APP_KEY")))
 	if err != nil {
@@ -54,14 +46,14 @@ func (tokenService *tokenService) Encode(id, tokenType string, expireTime primit
 	}
 	cfb := cipher.NewCFBEncrypter(block, iv)
 	cfb.XORKeyStream(cipherText[aes.BlockSize:], []byte(tokenInBase64))
-	tokenModel := new(EncryptedToken)
-	tokenModel.Token = string(cipherText)
-	tokenModel.ExpireDate = expireTime
-	return tokenModel, nil
+	encryptedToken := new(EncryptedToken)
+	encryptedToken.Token = string(cipherText)
+	encryptedToken.ExpireDate = expireDate
+	return encryptedToken, nil
 }
 
-//Decode decode
-func (tokenService *tokenService) Decode(token string) (*DecryptedToken, error) {
+//DecodeToken decode
+func DecodeToken(token string) (*DecryptedToken, error) {
 	block, err := aes.NewCipher([]byte(os.Getenv("APP_KEY")))
 	if err != nil {
 		return nil, err

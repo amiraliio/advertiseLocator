@@ -5,7 +5,7 @@ import (
 )
 
 //APIKeyCollection collection
-const APIKeyCollection string = "xApiKey"
+const APIKeyCollection string = "apiKey"
 
 //APIKeyHeaderName const
 const APIKeyHeaderName string = "x-api-key"

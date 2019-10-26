@@ -1,19 +1,23 @@
 package repositories
 
 import (
-	"github.com/amiraliio/advertiselocator/configs"
+	"github.com/amiraliio/advertiselocator/helpers"
 	"github.com/amiraliio/advertiselocator/models"
 )
 
-
-type System interface {
-
+//SystemRepository service
+type SystemRepository interface {
+	CreateAPIKey(api *models.API) (*models.API, error)
 }
 
-type systemService struct{}
+//SystemService service
+type SystemService struct{}
 
-
-func (systemService *systemService) CreateAPIKey(api *models.API) (*models.API, error){
-    db := configs.DB().Collection(models.APIKeyCollection, opts ...*options.CollectionOptions)
+//CreateAPIKey service
+func (systemService *SystemService) CreateAPIKey(api *models.API) (*models.API, error) {
+	_, err := helpers.Mongo().InsertOne(models.APIKeyCollection, api)
+	if err != nil {
+		return nil, err
+	}
+	return api, nil
 }
-
