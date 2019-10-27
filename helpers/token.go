@@ -33,44 +33,45 @@ type DecryptedToken struct {
 //EncodeToken encode
 func EncodeToken(id, tokenType string, expireDate primitive.DateTime) (*EncryptedToken, error) {
 	time := expireDate.Time().Unix()
-	token := id + tokenSplitter + tokenType + tokenSplitter + string(time)
+	token := []byte(id + tokenSplitter + tokenType + tokenSplitter + strconv.FormatInt(time, 10))
 	block, err := aes.NewCipher([]byte(os.Getenv("APP_KEY")))
 	if err != nil {
 		return nil, err
 	}
-	tokenInBase64 := base64.StdEncoding.EncodeToString([]byte(token))
-	cipherText := make([]byte, aes.BlockSize+len(tokenInBase64))
-	iv := cipherText[:aes.BlockSize] //identifier vector
+	cipherText := make([]byte, aes.BlockSize+len(token))
+	//identifier vector from 0 to before index 16
+	iv := cipherText[:aes.BlockSize]
+	//generate random number for iv
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return nil, err
 	}
 	cfb := cipher.NewCFBEncrypter(block, iv)
-	cfb.XORKeyStream(cipherText[aes.BlockSize:], []byte(tokenInBase64))
+	cfb.XORKeyStream(cipherText[aes.BlockSize:], token)
+	tokenInBase64 := base64.StdEncoding.EncodeToString(cipherText)
 	encryptedToken := new(EncryptedToken)
-	encryptedToken.Token = string(cipherText)
+	encryptedToken.Token = tokenInBase64
 	encryptedToken.ExpireDate = expireDate
 	return encryptedToken, nil
 }
 
 //DecodeToken decode
 func DecodeToken(token string) (*DecryptedToken, error) {
+	tokenInByte, err := base64.StdEncoding.DecodeString(token)
+	if err != nil {
+		return nil, err
+	}
+	if len(tokenInByte) < aes.BlockSize {
+		return nil, errors.New("token length is too short")
+	}
 	block, err := aes.NewCipher([]byte(os.Getenv("APP_KEY")))
 	if err != nil {
 		return nil, err
 	}
-	tokenText := []byte(token)
-	if len(tokenText) < aes.BlockSize {
-		return nil, errors.New("token length is too short")
-	}
-	iv := tokenText[:aes.BlockSize]
-	tokenText = tokenText[aes.BlockSize:]
+	iv := tokenInByte[:aes.BlockSize]
+	tokenInByte = tokenInByte[aes.BlockSize:]
 	cfb := cipher.NewCFBDecrypter(block, iv)
-	cfb.XORKeyStream(tokenText, tokenText)
-	data, err := base64.StdEncoding.DecodeString(string(tokenText))
-	if err != nil {
-		return nil, err
-	}
-	token = string(data)
+	cfb.XORKeyStream(tokenInByte, tokenInByte)
+	token = string(tokenInByte)
 	splittedToken := strings.Split(token, tokenSplitter)
 	if splittedToken != nil && len(splittedToken) == 3 {
 		decryptedToken := new(DecryptedToken)

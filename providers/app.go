@@ -4,6 +4,8 @@ import 	_ "github.com/joho/godotenv/autoload" //_ autoload the config variables 
 
 //Start application and initialize application assets
 func Start() {
+	//TODO validate for env parameter
+	//TODO for example .env app_key length must be 32 byte
 	initRoutes()
 	register()
 }

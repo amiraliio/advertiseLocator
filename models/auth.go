@@ -4,6 +4,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+///////////// collection names //////////////////
+
 //AuthCollection collection
 const AuthCollection string = "auth"
 
@@ -12,6 +14,8 @@ const APIKeyCollection string = "apiKey"
 
 //ClientCollection const
 const ClientCollection string = "client"
+
+///////////// register and login ways //////////////////
 
 //EmailAuthType auth type
 const EmailAuthType string = "email"
@@ -28,11 +32,15 @@ const FaceBookAuthType string = "facebook"
 //TwitterAuthType auth type
 const TwitterAuthType string = "twitter"
 
-//APIKeyHeaderName const
-const APIKeyHeaderName string = "x-api-key"
+///////////// header names //////////////////
 
-//InternalAPIKey const
-const InternalAPIKey string = "internal"
+//APIKeyHeaderKey const
+const APIKeyHeaderKey string = "x-api-key"
+
+//AuthorizationHeaderKey const
+const AuthorizationHeaderKey string = "Authorization"
+
+///////////// api key types //////////////////
 
 //ExternalAPIKey const
 const ExternalAPIKey string = "external"
@@ -45,6 +53,8 @@ const AndroidAPIKey string = "android"
 
 //IosAPIKey const
 const IosAPIKey string = "ios"
+
+///////////////////////////////////////////
 
 //Auth model
 type Auth struct {
@@ -72,10 +82,11 @@ type Client struct {
 
 //API model
 type API struct {
-	Base       ",inline"
-	Key        string             `json:"key" bson:"key"`
-	Name       string             `json:"name" bson:"name"`
-	ExpireDate primitive.DateTime `json:"expireDate" bson:"expireDate"`
-	Token      string             `json:"token" bson:"token"`
-	Type       string             `json:"type" bson:"type"`
+	Base        ",inline"
+	Key         string             `json:"key" bson:"key"`
+	Name        string             `json:"name" bson:"name"`
+	ExpireDate  primitive.DateTime `json:"expireDate" bson:"expireDate"`
+	Token       string             `json:"token" bson:"token"`
+	Type        string             `json:"type" bson:"type"`
+	Description string             `json:"description" bson:"description"`
 }

@@ -13,6 +13,18 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+//TODO must have admin access and without checkAPI middleware
+//TODO validation for type and request
+//TODO save API key per platform in mongo
+//TODO platform are web, ios, android
+//TODO that must be unique by platform and packageName
+//TODO just admin can add this type of api key
+//TODO when a same token generated with name and same type the old token must inactive
+//TODO move uuid to helpers
+//TODO move date parser to helpers
+//TODO change answer of errors
+//TODO must be admin id and read from token for created_by
+
 func getSystemRepo() repositories.SystemRepository {
 	return new(repositories.SystemService)
 }
@@ -27,7 +39,7 @@ func GenerateAPIKey(request echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
 	}
 	uuid := uuid.New().String()
-	dataTime, err := time.Parse("2020-03-12 15:04:05", requestAPIKey.ExpireDate)
+	dataTime, err := time.Parse("2006-01-02 15:04:05", requestAPIKey.ExpireDate)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -41,22 +53,14 @@ func GenerateAPIKey(request echo.Context) (err error) {
 	api.ExpireDate = token.ExpireDate
 	api.Token = token.Token
 	api.Type = requestAPIKey.Type
+	api.Description = requestAPIKey.Description
 	api.ID = primitive.NewObjectID()
 	api.Status = models.ActiveStatus
 	api.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
-	api.CreatedBy = primitive.NilObjectID //TODO must be admin id and read from token
-	api.UpdatedAt = primitive.NewDateTimeFromTime(time.Now())
-	api.UpdatedBy = primitive.NilObjectID //TODO must be admin id and read from token
-
+	api.CreatedBy = primitive.NilObjectID
 	data, err := getSystemRepo().CreateAPIKey(api)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	//TODO must have admin access and without checkAPI middleware
-	//TODO validation for type and request
-	//TODO save API key per platform in mongo
-	//TODO platform are web, ios, android
-	//TODO that must be unique by platform and packageName
-	//TODO just admin can add this type of api key
 	return request.JSON(http.StatusCreated, data)
 }
