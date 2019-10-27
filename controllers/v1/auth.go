@@ -69,7 +69,7 @@ func PersonRegister(request echo.Context) (err error) {
 	client.OSVersion = registerRequest.Client.OsVersion
 	client.API.Key = ""
 	client.API.Name = ""
-	client.API.ExpireDate = ""
+	client.API.ExpireDate = primitive.NewDateTimeFromTime(time.Now())
 	client.API.Type = models.InternalAPIKey
 	client.API.Token = ""
 	client.RefreshToken = ""     //TODO refresh token

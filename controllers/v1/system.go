@@ -38,8 +38,8 @@ func GenerateAPIKey(request echo.Context) (err error) {
 	api := new(models.API)
 	api.Key = uuid
 	api.Name = requestAPIKey.Name
-	api.ExpireDate = requestAPIKey.ExpireDate
-	api.Token = token
+	api.ExpireDate = token.ExpireDate
+	api.Token = token.Token
 	api.Type = requestAPIKey.Type
 	api.ID = primitive.NewObjectID()
 	api.Status = models.ActiveStatus
