@@ -12,26 +12,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/amiraliio/advertiselocator/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const tokenSplitter string = "_"
 
-//EncryptedToken data model
-type EncryptedToken struct {
-	Token      string             `json:"token"`
-	ExpireDate primitive.DateTime `json:"expireDate"`
-}
-
-//DecryptedToken data model
-type DecryptedToken struct {
-	ID         string             `json:"id"`
-	TokenType  string             `json:"tokenType"`
-	ExpireDate primitive.DateTime `json:"expireDate"`
-}
-
 //EncodeToken encode
-func EncodeToken(id, tokenType string, expireDate primitive.DateTime) (*EncryptedToken, error) {
+func EncodeToken(id, tokenType string, expireDate primitive.DateTime) (*models.API, error) {
 	time := expireDate.Time().Unix()
 	token := []byte(id + tokenSplitter + tokenType + tokenSplitter + strconv.FormatInt(time, 10))
 	block, err := aes.NewCipher([]byte(os.Getenv("APP_KEY")))
@@ -48,14 +37,14 @@ func EncodeToken(id, tokenType string, expireDate primitive.DateTime) (*Encrypte
 	cfb := cipher.NewCFBEncrypter(block, iv)
 	cfb.XORKeyStream(cipherText[aes.BlockSize:], token)
 	tokenInBase64 := base64.StdEncoding.EncodeToString(cipherText)
-	encryptedToken := new(EncryptedToken)
+	encryptedToken := new(models.API)
 	encryptedToken.Token = tokenInBase64
 	encryptedToken.ExpireDate = expireDate
 	return encryptedToken, nil
 }
 
 //DecodeToken decode
-func DecodeToken(token string) (*DecryptedToken, error) {
+func DecodeToken(token string) (*models.API, error) {
 	tokenInByte, err := base64.StdEncoding.DecodeString(token)
 	if err != nil {
 		return nil, err
@@ -74,9 +63,9 @@ func DecodeToken(token string) (*DecryptedToken, error) {
 	token = string(tokenInByte)
 	splittedToken := strings.Split(token, tokenSplitter)
 	if splittedToken != nil && len(splittedToken) == 3 {
-		decryptedToken := new(DecryptedToken)
-		decryptedToken.ID = splittedToken[0]
-		decryptedToken.TokenType = splittedToken[1]
+		decryptedToken := new(models.API)
+		decryptedToken.Key = splittedToken[0]
+		decryptedToken.Type = splittedToken[1]
 		timestamp, err := strconv.ParseInt(splittedToken[2], 10, 64)
 		if err != nil {
 			return nil, err
@@ -85,4 +74,22 @@ func DecodeToken(token string) (*DecryptedToken, error) {
 		return decryptedToken, nil
 	}
 	return nil, errors.New("data of token is not right")
+}
+
+//HashPassword helper
+func HashPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	if err != nil {
+		return "", err
+	}
+	return string(hash), nil
+}
+
+//CheckPasswordHash handler
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if err != nil {
+		return false
+	}
+	return true
 }

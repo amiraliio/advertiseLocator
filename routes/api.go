@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/amiraliio/advertiselocator/configs"
 	"github.com/amiraliio/advertiselocator/controllers/v1"
+	"github.com/amiraliio/advertiselocator/middleware"
 	"github.com/labstack/echo/v4"
 )
 
@@ -13,6 +14,8 @@ var (
 
 //API routes
 func API() {
-	apiV1.POST("/x-api-key", controllers.GenerateAPIKey).Name = "generate-x-api-key"
-	auth.POST("/person-register", controllers.PersonRegister).Name = "auth-person-register"
+	apiV1.POST("/x-api-key", controllers.GenerateAPIKey).Name = "api-v1-generate-x-api-key"
+
+	auth.Use(middleware.CheckAPIKey)
+	auth.POST("/person-register", controllers.PersonRegister).Name = "api-v1-auth-person-register"
 }

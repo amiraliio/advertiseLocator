@@ -21,7 +21,7 @@ const DeleteStatus string = "d"
 
 //Base model
 type Base struct {
-	ID        primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	ID        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	Status    string             `json:"status" bson:"status"`
 	CreatedAt primitive.DateTime `json:"createdAt" bson:"createdAt"`
 	CreatedBy primitive.ObjectID `json:"createdBy" bson:"createdBy"`

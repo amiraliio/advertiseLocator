@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/amiraliio/advertiselocator/helpers"
 	"github.com/amiraliio/advertiselocator/models"
 	"github.com/amiraliio/advertiselocator/repositories/v1"
 	"github.com/amiraliio/advertiselocator/requests"
@@ -17,6 +18,11 @@ func authRepository() repositories.AuthRepository {
 
 //PersonRegister controller to register person
 func PersonRegister(request echo.Context) (err error) {
+	//added from apikey middleware to context
+	xAPIKeyData := request.Get(models.APIKeyHeaderKey)
+	if helpers.IsInstance(xAPIKeyData, (*models.API)(nil)) {
+		return echo.NewHTTPError(http.StatusForbidden, "API key data not found")
+	}
 	registerRequest := new(requests.PersonRegister)
 	if err = request.Bind(registerRequest); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -48,7 +54,7 @@ func PersonRegister(request echo.Context) (err error) {
 	auth.Value = registerRequest.Email
 	auth.IP = request.RealIP()
 	auth.UserID = personID
-	auth.Password = registerRequest.Password //TODO hash this shit
+	auth.Password = helpers.HashPassword(registerRequest.Password) //TODO check error
 	auth.Type = models.EmailAuthType
 
 	client := new(models.Client)
@@ -67,11 +73,9 @@ func PersonRegister(request echo.Context) (err error) {
 	client.LastLogin = primitive.NewDateTimeFromTime(time.Now())
 	client.OSType = registerRequest.Client.OsType
 	client.OSVersion = registerRequest.Client.OsVersion
-	client.API.Key = ""
-	client.API.Name = ""
-	client.API.ExpireDate = primitive.NewDateTimeFromTime(time.Now()) //TODO change this to expire date must be from token x-api-key
-	client.API.Type = "" //that must be from token x-api-key
-	client.API.Token = ""
+	client.API.Key = xAPIKeyData.(models.API).Key
+	client.API.ExpireDate = xAPIKeyData.(models.API).ExpireDate
+	client.API.Type = xAPIKeyData.(models.API).Type
 	client.RefreshToken = ""     //TODO refresh token
 	client.Token = ""            //TODO token
 	client.VerificationCode = "" //TODO
