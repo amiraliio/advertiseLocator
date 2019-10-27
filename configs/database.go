@@ -17,7 +17,8 @@ func config() *mongo.Client {
 	} else {
 		config = "mongodb://" + os.Getenv("MONGO_HOST") + ":" + os.Getenv("MONGO_PORT")
 	}
-	context, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	context, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	client, err := mongo.Connect(context, options.Client().ApplyURI(config))
 	//TODO mongo defer close
 	if err != nil {

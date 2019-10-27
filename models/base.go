@@ -4,6 +4,21 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+
+//ActiveStatus status
+const ActiveStatus string = "a"
+
+//InactiveStatus status
+const InactiveStatus string = "i"
+
+//PendingStatus status
+const PendingStatus string = "p"
+
+//DeleteStatus status
+const DeleteStatus string = "d"
+
+
+
 //Base model
 type Base struct {
 	ID        primitive.ObjectID `json:"_id" bson:"_id,omitempty"`

@@ -25,7 +25,8 @@ type mongoService struct{}
 //InsertOne document in mongo
 func (service *mongoService) InsertOne(collectionName string, object interface{}) (primitive.ObjectID, error) {
 	db := configs.DB().Collection(collectionName)
-	context, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	entityModel, err := Flatten(object)
 	if err != nil {
 		return primitive.NilObjectID, err
