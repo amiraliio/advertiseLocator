@@ -1,6 +1,6 @@
 package models
 
-//Media model
+//BaseMedia model
 type BaseMedia struct {
 	OriginalURL string `json:"originalURL" bson:"originalURL"`
 	URL         string `json:"url" bson:"url"`
