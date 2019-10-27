@@ -1,6 +1,7 @@
 package requests
 
 //TODO oneof validation for Type
+//TODO validation for expiredate must be greater than current time
 
 //APIKey request model
 type APIKey struct {
