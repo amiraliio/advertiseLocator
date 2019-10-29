@@ -22,6 +22,6 @@ func Flatten(object interface{}) (interface{}, error) {
 //IsInstance helper
 func IsInstance(src, dst interface{}) bool {
 	fmt.Println(reflect.TypeOf(src))
-	fmt.Println(reflect.TypeOf(dst))
+	fmt.Println(reflect.TypeOf(src))
 	return reflect.TypeOf(src) == reflect.TypeOf(dst)
 }
