@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"go.mongodb.org/mongo-driver/bson"
+	"fmt"
 	"reflect"
 )
 
@@ -20,5 +21,7 @@ func Flatten(object interface{}) (interface{}, error) {
 
 //IsInstance helper
 func IsInstance(src, dst interface{}) bool {
+	fmt.Println(reflect.TypeOf(src))
+	fmt.Println(reflect.TypeOf(dst))
 	return reflect.TypeOf(src) == reflect.TypeOf(dst)
 }

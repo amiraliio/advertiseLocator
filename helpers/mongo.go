@@ -2,10 +2,10 @@ package helpers
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/bson"
 	"time"
 
 	"github.com/amiraliio/advertiselocator/configs"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -19,7 +19,8 @@ func Mongo() MongoInterface {
 //MongoInterface interface
 type MongoInterface interface {
 	InsertOne(collectionName string, object interface{}) (primitive.ObjectID, error)
-	FindOne(collectionName string, query bson.M) (bson.M, error)
+	FindOne(collectionName string, query bson.M, modelToMap interface{}) (interface{}, error)
+	List(collectionName string, query bson.D, modelToMap interface{}) ([]interface{}, error)
 }
 
 type mongoService struct{}
@@ -41,38 +42,36 @@ func (service *mongoService) InsertOne(collectionName string, object interface{}
 }
 
 //FindOne helper
-func (service *mongoService) FindOne(collectionName string, query bson.M) (bson.M, error) {
+func (service *mongoService) FindOne(collectionName string, query bson.M, modelToMap interface{}) (interface{}, error) {
 	db := configs.DB().Collection(collectionName)
 	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	cursor := db.FindOne(context, query)
-	var result bson.M
-	err := cursor.Decode(&result)
+	err := cursor.Decode(&modelToMap)
 	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return modelToMap, nil
 }
 
-
-func (service *mongoService) List(collectionName string, query bson.D) (bson.D, error){
+func (service *mongoService) List(collectionName string, query bson.D, modelToMap interface{}) ([]interface{}, error) {
 	db := configs.DB().Collection(collectionName)
 	context, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	cursor, err := db.Find(context, query)
-	if err !=nil{
+	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(context)
-	for cursor.Next(context){
-		var result bson.M
-		if err := cursor.Decode(&result); err !=nil{
+	var data []interface{}
+	for cursor.Next(context) {
+		if err := cursor.Decode(modelToMap); err != nil {
 			return nil, err
 		}
-
+		data = append(data, modelToMap)
 	}
-	if cursor.Err() !=nil{
-		return nil,cursor.Err()
+	if cursor.Err() != nil {
+		return nil, cursor.Err()
 	}
-	return
+	return data, nil
 }
