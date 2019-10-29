@@ -1,6 +1,6 @@
 package providers
 
-import 	_ "github.com/joho/godotenv/autoload" //_ autoload the config variables from .env file
+import 	_ "github.com/joho/godotenv/autoload" //_ autoloaded config variables from .env file
 
 //Start application and initialize application assets
 func Start() {
