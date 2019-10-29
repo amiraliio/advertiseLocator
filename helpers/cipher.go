@@ -20,9 +20,9 @@ import (
 const tokenSplitter string = "_"
 
 //EncodeToken encode
-func EncodeToken(id, tokenType string, expireDate primitive.DateTime) (*models.API, error) {
-	time := expireDate.Time().Unix()
-	token := []byte(id + tokenSplitter + tokenType + tokenSplitter + strconv.FormatInt(time, 10))
+func EncodeToken(id, tokenType, expire string) (*models.API, error) {
+	createdAt := time.Now()
+	token := []byte(id + tokenSplitter + tokenType + tokenSplitter + strconv.FormatInt(createdAt.Unix(), 10))
 	block, err := aes.NewCipher([]byte(os.Getenv("APP_KEY")))
 	if err != nil {
 		return nil, err
@@ -39,7 +39,12 @@ func EncodeToken(id, tokenType string, expireDate primitive.DateTime) (*models.A
 	tokenInBase64 := base64.StdEncoding.EncodeToString(cipherText)
 	encryptedToken := new(models.API)
 	encryptedToken.Token = tokenInBase64
-	encryptedToken.ExpireDate = expireDate
+	encryptedToken.CreatedAt = primitive.NewDateTimeFromTime(createdAt)
+	expireTime, err := strconv.Atoi(expire)
+	if err != nil {
+		return nil, err
+	}
+	encryptedToken.ExpireDate = primitive.NewDateTimeFromTime(createdAt.AddDate(0, 0, expireTime))
 	return encryptedToken, nil
 }
 
@@ -70,7 +75,7 @@ func DecodeToken(token string) (*models.API, error) {
 		if err != nil {
 			return nil, err
 		}
-		decryptedToken.ExpireDate = primitive.NewDateTimeFromTime(time.Unix(timestamp, 0))
+		decryptedToken.CreatedAt = primitive.NewDateTimeFromTime(time.Unix(timestamp, 0))
 		return decryptedToken, nil
 	}
 	return nil, errors.New("data of token is not right")

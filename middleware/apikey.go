@@ -2,6 +2,8 @@ package middleware
 
 import (
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/amiraliio/advertiselocator/helpers"
@@ -24,7 +26,11 @@ func CheckAPIKey(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return echo.NewHTTPError(http.StatusForbidden, err.Error())
 		}
-		if dataKey.ExpireDate < primitive.NewDateTimeFromTime(time.Now()) {
+		expireTime, err := strconv.Atoi(os.Getenv("API_KEY_TOKEN_EXPIRE_DAY"))
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		if dataKey.CreatedAt < primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, -expireTime)) {
 			return echo.NewHTTPError(http.StatusForbidden, lang.TheAPIKeyExpired)
 		}
 		request.Set(models.APIKeyHeaderKey, dataKey)

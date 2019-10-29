@@ -15,23 +15,6 @@ const APIKeyCollection string = "apiKey"
 //ClientCollection const
 const ClientCollection string = "client"
 
-///////////// register and login ways //////////////////
-
-//EmailAuthType auth type
-const EmailAuthType string = "email"
-
-//CellPhoneAuthType auth type
-const CellPhoneAuthType string = "cellPhone"
-
-//GoogleAuthType auth type
-const GoogleAuthType string = "google"
-
-//FaceBookAuthType auth type
-const FaceBookAuthType string = "facebook"
-
-//TwitterAuthType auth type
-const TwitterAuthType string = "twitter"
-
 ///////////// header names //////////////////
 
 //APIKeyHeaderKey const
@@ -40,19 +23,36 @@ const APIKeyHeaderKey string = "x-api-key"
 //AuthorizationHeaderKey const
 const AuthorizationHeaderKey string = "Authorization"
 
+///////////// register and login ways //////////////////
+
+//EmailAuthType auth type
+const EmailAuthType string = "EMAIL"
+
+//CellPhoneAuthType auth type
+const CellPhoneAuthType string = "CELLPHONE"
+
+//GoogleAuthType auth type
+const GoogleAuthType string = "GOOGLE"
+
+//FaceBookAuthType auth type
+const FaceBookAuthType string = "FACEBOOK"
+
+//TwitterAuthType auth type
+const TwitterAuthType string = "TWITTER"
+
 ///////////// api key types //////////////////
 
 //ExternalAPIKey const
-const ExternalAPIKey string = "external"
+const ExternalAPIKey string = "EXTERNAL"
 
 //WebAPIKey const
-const WebAPIKey string = "web"
+const WebAPIKey string = "WEB"
 
 //AndroidAPIKey const
-const AndroidAPIKey string = "android"
+const AndroidAPIKey string = "ANDROID"
 
 //IosAPIKey const
-const IosAPIKey string = "ios"
+const IosAPIKey string = "IOS"
 
 ///////////////////////////////////////////
 
@@ -74,7 +74,7 @@ type Client struct {
 	OSVersion        string             `json:"osVersion" bson:"osVersion"`
 	RefreshToken     string             `json:"refreshToken" bson:"refreshToken"`
 	Token            string             `json:"token" bson:"token"`
-	VerificationCode string             `json:"verificationCode" bson:"verificationCode"`
+	VerificationCode int                `json:"verificationCode" bson:"verificationCode"`
 	ExpireDate       primitive.DateTime `json:"expireDate" bson:"expireDate"`
 	API              API                `json:"api" bson:"api"`
 	Auth             Auth               `json:"auth" bson:"auth"`

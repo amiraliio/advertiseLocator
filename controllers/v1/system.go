@@ -1,8 +1,8 @@
 package controllers
 
 import (
+	"os"
 	"net/http"
-	"time"
 
 	"github.com/amiraliio/advertiselocator/helpers"
 	"github.com/amiraliio/advertiselocator/models"
@@ -39,11 +39,7 @@ func GenerateAPIKey(request echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
 	}
 	uuid := uuid.New().String()
-	dataTime, err := time.Parse("2006-01-02 15:04:05", requestAPIKey.ExpireDate)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-	token, err := helpers.EncodeToken(uuid, requestAPIKey.Type, primitive.NewDateTimeFromTime(dataTime))
+	token, err := helpers.EncodeToken(uuid, requestAPIKey.Type, os.Getenv("API_KEY_TOKEN_EXPIRE_DAY"))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -56,7 +52,7 @@ func GenerateAPIKey(request echo.Context) (err error) {
 	api.Description = requestAPIKey.Description
 	api.ID = primitive.NewObjectID()
 	api.Status = models.ActiveStatus
-	api.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
+	api.CreatedAt = token.CreatedAt
 	api.CreatedBy = primitive.NilObjectID
 	data, err := getSystemRepo().CreateAPIKey(api)
 	if err != nil {

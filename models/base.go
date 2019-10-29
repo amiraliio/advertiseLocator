@@ -6,16 +6,16 @@ import (
 
 
 //ActiveStatus status
-const ActiveStatus string = "a"
+const ActiveStatus string = "ACTIVE"
 
 //InactiveStatus status
-const InactiveStatus string = "i"
+const InactiveStatus string = "INACTIVE"
 
 //PendingStatus status
-const PendingStatus string = "p"
+const PendingStatus string = "PENDING"
 
 //DeleteStatus status
-const DeleteStatus string = "d"
+const DeleteStatus string = "DELETE"
 
 
 

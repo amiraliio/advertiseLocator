@@ -4,6 +4,23 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+
+//TODO order struct field from high to low field type size
+
+//////////// user collection ///////////////
+
+//PersonCollection collection
+const PersonCollection string = "persons"
+
+//////////// user types ///////////////
+
+//PersonUserType user type
+const PersonUserType string = "PERSON"
+
+//AdminUserType user type
+const AdminUserType string = "ADMIN"
+
+
 //BaseUser model
 type BaseUser struct {
 	Base     ",inline"
@@ -12,16 +29,6 @@ type BaseUser struct {
 	IP       string             `json:"ip" bson:"ip"`
 }
 
-//TODO order struct field from high to low field type size
-
-//PersonCollection collection
-const PersonCollection string = "persons"
-
-//PersonUserType user type
-const PersonUserType string = "person"
-
-//AdminUserType user type
-const AdminUserType string = "admin"
 
 //Person model
 type Person struct {
