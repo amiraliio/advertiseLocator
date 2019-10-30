@@ -70,7 +70,7 @@ func PersonRegister(request echo.Context) (err error) {
 	}
 	result, err := authRepository().PersonRegister(person, auth, client)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotModified, err.Error())
+		return echo.NewHTTPError(http.StatusConflict, err)
 	}
 	return request.JSON(http.StatusCreated, result)
 }

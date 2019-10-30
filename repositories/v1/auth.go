@@ -44,14 +44,12 @@ func (service *AuthService) PersonRegister(person *models.Person, auth *models.A
 
 func checkUserExistOrNot(auth *models.Auth) (bool, error) {
 	query := bson.M{"value": auth.Value, "status": models.ActiveStatus, "userType": auth.UserType, "type": auth.Type}
-	existUser, err := helpers.Mongo().FindOne(models.AuthCollection, query, new(models.Auth))
-	if err != nil {
+	var result *models.Auth
+	if err := helpers.Mongo().FindOne(models.AuthCollection, query).Decode(&result); err != nil {
 		return false, err
 	}
-	if existUser != nil && helpers.IsInstance(existUser, (*models.Auth)(nil)) {
-		if existUser.(models.Auth).Value == auth.Value {
-			return true, nil
-		}
+	if result != nil && result.Value == auth.Value {
+		return true, nil
 	}
 	return false, nil
 }

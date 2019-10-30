@@ -7,6 +7,7 @@ import (
 	"github.com/amiraliio/advertiselocator/configs"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 //TODO improvement must be just interface not function
@@ -19,7 +20,7 @@ func Mongo() MongoInterface {
 //MongoInterface interface
 type MongoInterface interface {
 	InsertOne(collectionName string, object interface{}) (primitive.ObjectID, error)
-	FindOne(collectionName string, query bson.M, modelToMap interface{}) (interface{}, error)
+	FindOne(collectionName string, query bson.M) *mongo.SingleResult
 	List(collectionName string, query bson.D, modelToMap interface{}) ([]interface{}, error)
 }
 
@@ -42,16 +43,11 @@ func (service *mongoService) InsertOne(collectionName string, object interface{}
 }
 
 //FindOne helper
-func (service *mongoService) FindOne(collectionName string, query bson.M, modelToMap interface{}) (interface{}, error) {
+func (service *mongoService) FindOne(collectionName string, query bson.M) *mongo.SingleResult {
 	db := configs.DB().Collection(collectionName)
 	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	cursor := db.FindOne(context, query)
-	err := cursor.Decode(&modelToMap)
-	if err != nil {
-		return nil, err
-	}
-	return modelToMap, nil
+	return db.FindOne(context, query)
 }
 
 func (service *mongoService) List(collectionName string, query bson.D, modelToMap interface{}) ([]interface{}, error) {

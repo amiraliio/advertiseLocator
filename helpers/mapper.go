@@ -1,9 +1,9 @@
 package helpers
 
 import (
-	"go.mongodb.org/mongo-driver/bson"
-	"fmt"
 	"reflect"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 //Flatten can flat data models of embedded struct
@@ -21,7 +21,5 @@ func Flatten(object interface{}) (interface{}, error) {
 
 //IsInstance helper
 func IsInstance(src, dst interface{}) bool {
-	fmt.Println(reflect.TypeOf(src))
-	fmt.Println(reflect.TypeOf(src))
 	return reflect.TypeOf(src) == reflect.TypeOf(dst)
 }
