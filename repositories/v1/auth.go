@@ -45,9 +45,7 @@ func (service *AuthService) PersonRegister(person *models.Person, auth *models.A
 func checkUserExistOrNot(auth *models.Auth) (bool, error) {
 	query := bson.M{"value": auth.Value, "status": models.ActiveStatus, "userType": auth.UserType, "type": auth.Type}
 	var result *models.Auth
-	if err := helpers.Mongo().FindOne(models.AuthCollection, query).Decode(&result); err != nil {
-		return false, err
-	}
+	 _ = helpers.Mongo().FindOne(models.AuthCollection, query).Decode(&result);
 	if result != nil && result.Value == auth.Value {
 		return true, nil
 	}
