@@ -11,6 +11,8 @@ import (
 )
 
 //TODO improvement must be just interface not function
+//TODO sort, filter, pagination for List
+//TODO complete this helper
 
 //Mongo build
 func Mongo() MongoInterface {
@@ -22,25 +24,10 @@ type MongoInterface interface {
 	InsertOne(collectionName string, object interface{}) (primitive.ObjectID, error)
 	FindOne(collectionName string, query bson.M) *mongo.SingleResult
 	List(collectionName string, query bson.D, modelToMap interface{}) ([]interface{}, error)
+	FindOneAndUpdate(collectionName string, filter bson.D, update bson.D) *mongo.SingleResult
 }
 
 type mongoService struct{}
-
-//InsertOne document in mongo
-func (service *mongoService) InsertOne(collectionName string, object interface{}) (primitive.ObjectID, error) {
-	db := configs.DB().Collection(collectionName)
-	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	entityModel, err := Flatten(object)
-	if err != nil {
-		return primitive.NilObjectID, err
-	}
-	result, err := db.InsertOne(context, entityModel)
-	if err != nil {
-		return primitive.NilObjectID, err
-	}
-	return result.InsertedID.(primitive.ObjectID), nil
-}
 
 //FindOne helper
 func (service *mongoService) FindOne(collectionName string, query bson.M) *mongo.SingleResult {
@@ -70,4 +57,27 @@ func (service *mongoService) List(collectionName string, query bson.D, modelToMa
 		return nil, cursor.Err()
 	}
 	return data, nil
+}
+
+//InsertOne document in mongo
+func (service *mongoService) InsertOne(collectionName string, object interface{}) (primitive.ObjectID, error) {
+	db := configs.DB().Collection(collectionName)
+	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	entityModel, err := Flatten(object)
+	if err != nil {
+		return primitive.NilObjectID, err
+	}
+	result, err := db.InsertOne(context, entityModel)
+	if err != nil {
+		return primitive.NilObjectID, err
+	}
+	return result.InsertedID.(primitive.ObjectID), nil
+}
+
+func (service *mongoService) FindOneAndUpdate(collectionName string, filter bson.D, update bson.D) *mongo.SingleResult {
+	collection := configs.DB().Collection(collectionName)
+	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	return collection.FindOneAndUpdate(context, filter, update)
 }

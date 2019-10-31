@@ -36,7 +36,6 @@ func PersonRegister(request echo.Context) (err error) {
 	if err = request.Validate(registerRequest); err != nil {
 		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
 	}
-
 	//person model
 	person := new(models.Person)
 	personID := primitive.NewObjectID()
@@ -64,7 +63,7 @@ func PersonRegister(request echo.Context) (err error) {
 	}
 	auth.Password = hashedPassword
 	auth.Type = models.EmailAuthType
-	client, err := clientMapper(request, auth, registerRequest, xAPIKeyData.(*models.API))
+	client, err := clientMapper(request, auth, &registerRequest.Client, xAPIKeyData.(*models.API))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -76,11 +75,38 @@ func PersonRegister(request echo.Context) (err error) {
 }
 
 //PersonLogin controller
-func PersonLogin() (err error) {
-	return nil
+func PersonLogin(request echo.Context) (err error) {
+	//added from apikey middleware to context
+	xAPIKeyData := request.Get(models.APIKeyHeaderKey)
+	if !helpers.IsInstance(xAPIKeyData, (*models.API)(nil)) {
+		return echo.NewHTTPError(http.StatusForbidden, "API key must be instance of API model")
+	}
+	loginRequest := new(requests.PersonLogin)
+	if err = request.Bind(loginRequest); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	if err = request.Validate(loginRequest); err != nil {
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
+	}
+	auth, err := authRepository().GetAuthData(loginRequest.Email)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNonAuthoritativeInfo, err.Error())
+	}
+	if !helpers.CheckPasswordHash(loginRequest.Password, auth.Password) {
+		return echo.NewHTTPError(http.StatusNonAuthoritativeInfo, "auth value or password is wrong")
+	}
+	client, err := clientMapper(request, auth, &loginRequest.Client, xAPIKeyData.(*models.API))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	_, err = authRepository().InsertClient(client)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return request.JSON(http.StatusOK, client)
 }
 
-func clientMapper(request echo.Context, auth *models.Auth, registerRequest *requests.PersonRegister, xAPIKeyData *models.API) (*models.Client, error) {
+func clientMapper(request echo.Context, auth *models.Auth, clientRequest *requests.Client, xAPIKeyData *models.API) (*models.Client, error) {
 	//client model
 	client := new(models.Client)
 	clientID := primitive.NewObjectID()
@@ -91,11 +117,11 @@ func clientMapper(request echo.Context, auth *models.Auth, registerRequest *requ
 	client.UserID = auth.UserID
 	client.UserType = models.PersonUserType
 	client.IP = request.RealIP()
-	client.ClientID = registerRequest.Client.ID
-	client.Version = registerRequest.Client.Version
+	client.ClientID = clientRequest.ID
+	client.Version = clientRequest.Version
+	client.OSType = clientRequest.OsType
+	client.OSVersion = clientRequest.OsVersion
 	client.LastLogin = primitive.NewDateTimeFromTime(time.Now())
-	client.OSType = registerRequest.Client.OsType
-	client.OSVersion = registerRequest.Client.OsVersion
 	client.API.Key = xAPIKeyData.Key
 	client.API.ExpireDate = xAPIKeyData.ExpireDate
 	client.API.Type = xAPIKeyData.Type

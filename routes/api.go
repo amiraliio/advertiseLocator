@@ -18,4 +18,5 @@ func API() {
 
 	auth.Use(middleware.CheckAPIKey)
 	auth.POST("/person-register", controllers.PersonRegister).Name = "api-v1-auth-person-register"
+	auth.POST("/person-login", controllers.PersonLogin).Name = "api-v1-auth-person-login"
 }
