@@ -10,6 +10,8 @@ import (
 	"github.com/amiraliio/advertiselocator/routes"
 )
 
+//TODO use echo logger
+
 //Init routes in the package main
 func initRoutes() {
 	routes.API()
@@ -21,7 +23,7 @@ func initRoutes() {
 func printRoutesToConsole() {
 	routes, err := json.MarshalIndent(configs.Server.Routes(), "", "  ")
 	if err != nil {
-		log.Println(err.Error()) //TODO use echo logger
+		log.Println(err.Error())
 	}
 	fmt.Println(string(routes))
 }
