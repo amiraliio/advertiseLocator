@@ -64,7 +64,7 @@ func PersonRegister(request echo.Context) (err error) {
 	}
 	auth.Password = hashedPassword
 	auth.Type = models.EmailAuthType
-	client, err := clientMapper(request, personID, registerRequest, xAPIKeyData.(*models.API), authID)
+	client, err := clientMapper(request, auth, registerRequest, xAPIKeyData.(*models.API))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -80,15 +80,15 @@ func PersonLogin() (err error) {
 	return nil
 }
 
-func clientMapper(request echo.Context, personID primitive.ObjectID, registerRequest *requests.PersonRegister, xAPIKeyData *models.API, authID primitive.ObjectID) (*models.Client, error) {
+func clientMapper(request echo.Context, auth *models.Auth, registerRequest *requests.PersonRegister, xAPIKeyData *models.API) (*models.Client, error) {
 	//client model
 	client := new(models.Client)
 	clientID := primitive.NewObjectID()
 	client.ID = clientID
 	client.Status = models.ActiveStatus
 	client.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
-	client.CreatedBy = personID
-	client.UserID = personID
+	client.CreatedBy = auth.UserID
+	client.UserID = auth.UserID
 	client.UserType = models.PersonUserType
 	client.IP = request.RealIP()
 	client.ClientID = registerRequest.Client.ID
@@ -105,7 +105,7 @@ func clientMapper(request echo.Context, personID primitive.ObjectID, registerReq
 		return nil, err
 	}
 	client.RefreshToken = refreshToken.Token
-	clientToken, err := helpers.EncodeToken(personID.String(), models.PersonUserType, os.Getenv("CLIENT_TOKEN_EXPIRE_DAY"))
+	clientToken, err := helpers.EncodeToken(auth.UserID.String(), models.PersonUserType, os.Getenv("CLIENT_TOKEN_EXPIRE_DAY"))
 	if err != nil {
 		return nil, err
 	}
@@ -113,6 +113,6 @@ func clientMapper(request echo.Context, personID primitive.ObjectID, registerReq
 	rand.Seed(time.Now().UnixNano())
 	client.VerificationCode = rand.Int()
 	client.ExpireDate = clientToken.ExpireDate
-	client.Auth.ID = authID
+	client.Auth = *auth
 	return client, nil
 }
