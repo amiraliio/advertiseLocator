@@ -21,7 +21,7 @@ func CheckAPIKey(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(request echo.Context) error {
 		xAPIKey := request.Request().Header.Get(models.APIKeyHeaderKey)
 		if xAPIKey == "" {
-			return helpers.ErrorResponse(request,
+			return helpers.ResponseError(request,
 				http.StatusForbidden,
 				helpers.AUTH_TARGET,
 				http.StatusText(http.StatusForbidden),

@@ -10,7 +10,7 @@ import (
 //     "error": {
 //         "code": 422,
 //         "target": "insert",
-//         "mesasge": "unproccesable entity",
+//         "message": "unprocessable entity",
 //         "details": [
 //             {
 //                 "code": "m-1000",
@@ -36,8 +36,14 @@ const (
 	APIKEY_TARGET     string = "APIKey"
 )
 
+type ResponseModel struct {
+	Success bool        `json:"success"`
+	Error   ErrorModel  `json:"error"`
+	Data    interface{} `json:"data"`
+}
+
 //ErrorMessage model
-type ErrorMessage struct {
+type ErrorModel struct {
 	Code    int            `json:"code"`
 	Message string         `json:"message"`
 	Target  string         `json:"target"`
@@ -52,8 +58,8 @@ type ErrorDetail struct {
 }
 
 //ErrorResponse helper
-func ErrorResponse(request echo.Context, httpCode int, httpTarget, httpMessage, internalCode, detailTarget, detailMessage string) error {
-	errorMessage := new(ErrorMessage)
+func ResponseError(request echo.Context, httpCode int, httpTarget, httpMessage, internalCode, detailTarget, detailMessage string) error {
+	errorMessage := new(ErrorModel)
 	errorMessage.Code = httpCode
 	errorMessage.Message = httpMessage
 	errorMessage.Target = httpTarget
@@ -62,5 +68,18 @@ func ErrorResponse(request echo.Context, httpCode int, httpTarget, httpMessage, 
 	body.Target = detailTarget
 	body.Message = detailMessage
 	errorMessage.Details = append(errorMessage.Details, body)
-	return request.JSONPretty(httpCode, errorMessage, "	")
+	response := new(ResponseModel)
+	response.Success = false
+	response.Error = *errorMessage
+	response.Data = nil
+	return request.JSONPretty(httpCode, response, "	")
+}
+
+func ResponseOk(request echo.Context, httpCode int, data interface{}) error {
+	response := new(ResponseModel)
+	response.Success = true
+	errorMessage := new(ErrorModel)
+	response.Error = *errorMessage
+	response.Data = data
+	return request.JSONPretty(httpCode, response, "	")
 }

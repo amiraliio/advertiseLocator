@@ -71,7 +71,7 @@ func PersonRegister(request echo.Context) (err error) {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusConflict, err)
 	}
-	return request.JSON(http.StatusCreated, result)
+	return helpers.ResponseOk(request, http.StatusCreated, result)
 }
 
 //PersonLogin controller
