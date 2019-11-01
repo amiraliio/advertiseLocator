@@ -103,7 +103,7 @@ func PersonLogin(request echo.Context) (err error) {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	return request.JSON(http.StatusOK, client)
+	return helpers.ResponseOk(request, http.StatusOK, client)
 }
 
 func clientMapper(request echo.Context, auth *models.Auth, clientRequest *requests.Client, xAPIKeyData *models.API) (*models.Client, error) {

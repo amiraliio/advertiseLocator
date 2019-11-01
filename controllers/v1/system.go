@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"os"
 	"net/http"
+	"os"
 
 	"github.com/amiraliio/advertiselocator/helpers"
 	"github.com/amiraliio/advertiselocator/models"
@@ -58,5 +58,5 @@ func GenerateAPIKey(request echo.Context) (err error) {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	return request.JSON(http.StatusCreated, data)
+	return helpers.ResponseOk(request, http.StatusCreated, data)
 }

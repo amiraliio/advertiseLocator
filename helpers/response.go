@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"github.com/labstack/echo/v4"
+	"strconv"
 )
 
 //sample of structure response
@@ -37,9 +38,17 @@ const (
 )
 
 type ResponseModel struct {
-	Success bool        `json:"success"`
-	Error   ErrorModel  `json:"error"`
-	Data    interface{} `json:"data"`
+	Success    bool             `json:"success"`
+	Error      *ErrorModel      `json:"error"`
+	Data       interface{}      `json:"data"`
+	Pagination *PaginationModel `json:"pagination"`
+}
+
+type PaginationModel struct {
+	Page      int `json:"page"`
+	Limit     int `json:"limit"`
+	LastIndex int `json:"lastIndex"`
+	Total     int `json:"total"`
 }
 
 //ErrorMessage model
@@ -70,16 +79,22 @@ func ResponseError(request echo.Context, httpCode int, httpTarget, httpMessage, 
 	errorMessage.Details = append(errorMessage.Details, body)
 	response := new(ResponseModel)
 	response.Success = false
-	response.Error = *errorMessage
+	response.Error = errorMessage
 	response.Data = nil
+	response.Pagination = nil
 	return request.JSONPretty(httpCode, response, "	")
 }
 
 func ResponseOk(request echo.Context, httpCode int, data interface{}) error {
 	response := new(ResponseModel)
 	response.Success = true
-	errorMessage := new(ErrorModel)
-	response.Error = *errorMessage
+	response.Error = nil
 	response.Data = data
+	pagination := new(PaginationModel)
+	page, _ := strconv.Atoi(request.QueryParam("page"))
+	pagination.Page = page
+	limit, _ := strconv.Atoi(request.QueryParam("limit"))
+	pagination.Limit = limit
+	pagination.Total = pagination.Page * pagination.Limit
 	return request.JSONPretty(httpCode, response, "	")
 }
