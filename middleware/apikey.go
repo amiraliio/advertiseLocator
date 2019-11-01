@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/amiraliio/advertiselocator/configs"
 	"github.com/amiraliio/advertiselocator/helpers"
 	lang "github.com/amiraliio/advertiselocator/lang/eng"
 	"github.com/amiraliio/advertiselocator/models"
@@ -15,13 +14,20 @@ import (
 )
 
 //TODO detect user agent os to match apikey token and agent request
+//TODO dynamic generate internal code
 
 //CheckAPIKey middleware
 func CheckAPIKey(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(request echo.Context) error {
 		xAPIKey := request.Request().Header.Get(models.APIKeyHeaderKey)
 		if xAPIKey == "" {
-			return configs.ErrorResponse(http.StatusForbidden, "m1000", "Access Forbidden", "apiKey", lang.MustSetValidAPIKey)
+			return helpers.ErrorResponse(request,
+				http.StatusForbidden,
+				helpers.AUTH_TARGET,
+				http.StatusText(http.StatusForbidden),
+				"m-1000",
+				helpers.APIKEY_TARGET,
+				lang.MustSetValidAPIKey)
 		}
 		dataKey, err := helpers.DecodeToken(xAPIKey)
 		if err != nil {
