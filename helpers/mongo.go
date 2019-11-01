@@ -37,6 +37,7 @@ func (service *mongoService) FindOne(collectionName string, query bson.M) *mongo
 	return db.FindOne(context, query)
 }
 
+//List helper
 func (service *mongoService) List(collectionName string, query bson.D, modelToMap interface{}) ([]interface{}, error) {
 	db := configs.DB().Collection(collectionName)
 	context, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -75,6 +76,7 @@ func (service *mongoService) InsertOne(collectionName string, object interface{}
 	return result.InsertedID.(primitive.ObjectID), nil
 }
 
+//FindOneAndUpdate helper
 func (service *mongoService) FindOneAndUpdate(collectionName string, filter bson.D, update bson.D) *mongo.SingleResult {
 	collection := configs.DB().Collection(collectionName)
 	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)

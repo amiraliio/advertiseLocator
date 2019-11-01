@@ -24,6 +24,8 @@ func framework() *echo.Echo {
 	framework := echo.New()
 	//instance of custom validator
 	framework.Validator = &validation{validator: validator.New()}
+	//custom error response handler
+	// framework.HTTPErrorHandler = customErrorHandler
 	// Debug mode
 	debug, err := strconv.ParseBool(os.Getenv("SERVER_DEBUG"))
 	if err != nil {

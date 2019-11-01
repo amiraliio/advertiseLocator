@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/amiraliio/advertiselocator/configs"
 	"github.com/amiraliio/advertiselocator/helpers"
 	lang "github.com/amiraliio/advertiselocator/lang/eng"
 	"github.com/amiraliio/advertiselocator/models"
@@ -20,7 +21,7 @@ func CheckAPIKey(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(request echo.Context) error {
 		xAPIKey := request.Request().Header.Get(models.APIKeyHeaderKey)
 		if xAPIKey == "" {
-			return echo.NewHTTPError(http.StatusForbidden, lang.MustSetValidAPIKey)
+			return configs.ErrorResponse(http.StatusForbidden, "m1000", "Access Forbidden", "apiKey", lang.MustSetValidAPIKey)
 		}
 		dataKey, err := helpers.DecodeToken(xAPIKey)
 		if err != nil {
