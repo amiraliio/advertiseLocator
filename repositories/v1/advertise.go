@@ -2,9 +2,12 @@ package repositories
 
 
 
-type AdvertiseRepository interface{
+type AdvertiseInterface interface{
 
 }
 
-type AdvertiseService struct{}
+type AdvertiseRepository struct{}
+
+
+
 

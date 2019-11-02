@@ -23,10 +23,10 @@ func CheckAPIKey(next echo.HandlerFunc) echo.HandlerFunc {
 		if xAPIKey == "" {
 			return helpers.ResponseError(request,
 				http.StatusForbidden,
-				helpers.AUTH_TARGET,
+				helpers.AuthTarget,
 				http.StatusText(http.StatusForbidden),
-				"m-1000",
-				helpers.APIKEY_TARGET,
+				"M1000",
+				helpers.ApiKeyTarget,
 				lang.MustSetValidAPIKey)
 		}
 		dataKey, err := helpers.DecodeToken(xAPIKey)

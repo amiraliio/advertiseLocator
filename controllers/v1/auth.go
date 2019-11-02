@@ -63,7 +63,7 @@ func PersonRegister(request echo.Context) (err error) {
 	}
 	auth.Password = hashedPassword
 	auth.Type = models.EmailAuthType
-	client, err := clientMapper(request, auth, &registerRequest.Client, xAPIKeyData.(*models.API))
+	client, err := clientMapper(request, auth, registerRequest.Client, xAPIKeyData.(*models.API))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -95,7 +95,7 @@ func PersonLogin(request echo.Context) (err error) {
 	if !helpers.CheckPasswordHash(loginRequest.Password, auth.Password) {
 		return echo.NewHTTPError(http.StatusNonAuthoritativeInfo, "auth value or password is wrong")
 	}
-	client, err := clientMapper(request, auth, &loginRequest.Client, xAPIKeyData.(*models.API))
+	client, err := clientMapper(request, auth, loginRequest.Client, xAPIKeyData.(*models.API))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -139,6 +139,6 @@ func clientMapper(request echo.Context, auth *models.Auth, clientRequest *reques
 	rand.Seed(time.Now().UnixNano())
 	client.VerificationCode = rand.Int()
 	client.ExpireDate = clientToken.ExpireDate
-	client.Auth = *auth
+	client.Auth = auth
 	return client, nil
 }

@@ -4,7 +4,7 @@ package requests
 
 //APIKey request model
 type APIKey struct {
-	Type        string `json:"type" bson:"type" validate:"required"`
-	Name        string `json:"name" bson:"name" validate:"required,min=5,max=150"`
-	Description string `json:"description" bson:"description" validate:"min=10,max=400"`
+	Type        string `json:"type" validate:"required"`
+	Name        string `json:"name" validate:"required,min=5,max=150"`
+	Description string `json:"description" validate:"omitempty,min=10,max=400"`
 }

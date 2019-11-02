@@ -1,5 +1,24 @@
 package models
 
+//image size
+const (
+	OriginalSize  string = "ORIGINAL"
+	MediumSize    string = "MEDIUM"
+	ThumbnailSize string = "THUMBNAIL"
+)
+
+//media file types
+const (
+	TypePDF  string = "pdf"
+	TypeJPG  string = "jpg"
+	TypeJPEG string = "jpeg"
+	TypeGIF  string = "gif"
+	TypePNG  string = "png"
+	TypeMP4  string = "mp4"
+	Type3GP  string = "3gp"
+	TypeMPEG string = "mpeg"
+)
+
 //BaseMedia model
 type BaseMedia struct {
 	OriginalURL string `json:"originalURL" bson:"originalURL"`

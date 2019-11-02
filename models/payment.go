@@ -11,7 +11,7 @@ type Payment struct {
 	Bank          string             `json:"bank" bson:"bank"`
 	Amount        string             `json:"amount" bson:"amount"`
 	Type          string             `json:"type" bson:"type"`
-	Date          primitive.DateTime `json:"date" bson:"date"`
 	OutputAccount string             `json:"outputAccount" bson:"outputAccount"`
 	InputAccount  string             `json:"InputAccount" bson:"inputAccount"`
+	Date          primitive.DateTime `json:"date" bson:"date"`
 }

@@ -4,57 +4,35 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-///////////// collection names //////////////////
+//authentication collection
+const (
+	AuthCollection   string = "auth"
+	APIKeyCollection string = "apiKey"
+	ClientCollection string = "client"
+)
 
-//AuthCollection collection
-const AuthCollection string = "auth"
+//authentication headers
+const (
+	APIKeyHeaderKey        string = "x-api-key"
+	AuthorizationHeaderKey string = "Authorization"
+)
 
-//APIKeyCollection collection
-const APIKeyCollection string = "apiKey"
+//authentication types
+const (
+	EmailAuthType     string = "EMAIL"
+	CellPhoneAuthType string = "CELLPHONE"
+	GoogleAuthType    string = "GOOGLE"
+	FaceBookAuthType  string = "FACEBOOK"
+	TwitterAuthType   string = "TWITTER"
+)
 
-//ClientCollection const
-const ClientCollection string = "client"
-
-///////////// header names //////////////////
-
-//APIKeyHeaderKey const
-const APIKeyHeaderKey string = "x-api-key"
-
-//AuthorizationHeaderKey const
-const AuthorizationHeaderKey string = "Authorization"
-
-///////////// register and login ways //////////////////
-
-//EmailAuthType auth type
-const EmailAuthType string = "EMAIL"
-
-//CellPhoneAuthType auth type
-const CellPhoneAuthType string = "CELLPHONE"
-
-//GoogleAuthType auth type
-const GoogleAuthType string = "GOOGLE"
-
-//FaceBookAuthType auth type
-const FaceBookAuthType string = "FACEBOOK"
-
-//TwitterAuthType auth type
-const TwitterAuthType string = "TWITTER"
-
-///////////// api key types //////////////////
-
-//ExternalAPIKey const
-const ExternalAPIKey string = "EXTERNAL"
-
-//WebAPIKey const
-const WebAPIKey string = "WEB"
-
-//AndroidAPIKey const
-const AndroidAPIKey string = "ANDROID"
-
-//IosAPIKey const
-const IosAPIKey string = "IOS"
-
-///////////////////////////////////////////
+//api key types
+const (
+	ExternalAPIKey string = "EXTERNAL"
+	WebAPIKey      string = "WEB"
+	AndroidAPIKey  string = "ANDROID"
+	IosAPIKey      string = "IOS"
+)
 
 //Auth model
 type Auth struct {
@@ -76,8 +54,8 @@ type Client struct {
 	Token            string             `json:"token" bson:"token"`
 	VerificationCode int                `json:"verificationCode" bson:"verificationCode"`
 	ExpireDate       primitive.DateTime `json:"expireDate" bson:"expireDate"`
-	API              API                `json:"api" bson:"api"`
-	Auth             Auth               `json:"auth" bson:"auth"`
+	API              *API               `json:"api" bson:"api"`
+	Auth             *Auth              `json:"auth" bson:"auth"`
 }
 
 //API model

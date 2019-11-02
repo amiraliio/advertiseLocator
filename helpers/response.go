@@ -26,15 +26,14 @@ import (
 //the error and response message model implemented according to the OASIS Standard incorporating Approved standard
 //referenced by link http://docs.oasis-open.org/odata/odata-json-format/v4.0/errata02/os/odata-json-format-v4.0-errata02-os-complete.html#_Toc403940655
 
+//response targets
 const (
-	INSERT_TARGET     string = "Insert"
-	UPDATE_TARGET     string = "Update"
-	DELETE_TARGET     string = "Delete"
-	LIST              string = "Query"
-	AUTH_TARGET       string = "Authentication"
-	AUTHORIZED_TARGET string = "Authorization"
-	REGISTER_TARGET   string = "Register"
-	APIKEY_TARGET     string = "APIKey"
+	InsertTarget string = "Insert"
+	UpdateTarget string = "Update"
+	DeleteTarget string = "Delete"
+	QueryTarget  string = "Query"
+	AuthTarget   string = "Authentication"
+	ApiKeyTarget string = "APIKey"
 )
 
 type ResponseModel struct {
