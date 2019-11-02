@@ -1,9 +1,9 @@
 package providers
 
-import 	_ "github.com/joho/godotenv/autoload" //_ autoloaded config variables from .env file
+import _ "github.com/joho/godotenv/autoload" //_ accoladed config variables from .env file
 
-	//TODO validate for env parameter
-	//TODO for example .env app_key length must be 32 byte
+//TODO validate for env parameter
+//TODO for example .env app_key length must be 32 byte
 
 //Start application and initialize application assets
 func Start() {

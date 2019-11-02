@@ -8,6 +8,7 @@ import (
 type BaseFilter struct {
 	FromDate primitive.DateTime `json:"fromDate" query:"fromDate" bson:"fromDate"`
 	ToDate   primitive.DateTime `json:"toDate" query:"toDate" bson:"toDate"`
+	UserID   primitive.ObjectID `json:"userID" query:"userID" bson:"userID"`
 }
 
 //TagFilter filter

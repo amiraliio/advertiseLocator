@@ -15,7 +15,7 @@ const (
 //Base model
 type Base struct {
 	Status    string             `json:"status" bson:"status"`
-	ID        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	ID        primitive.ObjectID `json:"id" bson:"_id"`
 	CreatedAt primitive.DateTime `json:"createdAt" bson:"createdAt"`
 	CreatedBy primitive.ObjectID `json:"createdBy" bson:"createdBy"`
 	UpdatedAt primitive.DateTime `json:"updatedAt" bson:"updatedAt"`

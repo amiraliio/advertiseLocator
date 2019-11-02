@@ -29,7 +29,7 @@ func AddAdvertise(request echo.Context) (err error) {
 			http.StatusText(http.StatusBadRequest),
 			"CA1000",
 			"Insert Advertise",
-			"There Is a problem while binding the request",
+			err.Error(),
 		)
 	}
 	if err = request.Validate(advertiseRequest); err != nil {
@@ -68,14 +68,26 @@ func AddAdvertise(request echo.Context) (err error) {
 			http.StatusText(http.StatusBadRequest),
 			"CA1002",
 			"Insert Advertise",
-			"Advertise data cannot insert",
+			err.Error(),
 		)
 	}
 	return helpers.ResponseOk(request, http.StatusCreated, result)
 }
 
 func ListOfAdvertises(request echo.Context) (err error) {
-	return nil
+	results, err := advertiseRepository().ListOfAdvertise()
+	if err != nil {
+		return helpers.ResponseError(
+			request,
+			http.StatusBadRequest,
+			helpers.QueryTarget,
+			http.StatusText(http.StatusBadRequest),
+			"CA1003",
+			"List Of Advertise",
+			err.Error(),
+		)
+	}
+	return helpers.ResponseOk(request, http.StatusCreated, results)
 }
 
 func GetAdvertise(request echo.Context) (err error) {

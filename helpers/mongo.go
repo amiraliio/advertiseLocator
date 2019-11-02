@@ -23,7 +23,7 @@ func Mongo() MongoInterface {
 type MongoInterface interface {
 	InsertOne(collectionName string, object interface{}) (primitive.ObjectID, error)
 	FindOne(collectionName string, query bson.M) *mongo.SingleResult
-	List(collectionName string, query bson.D, modelToMap interface{}) ([]interface{}, error)
+	List(collectionName string, query bson.D) (*mongo.Cursor, error)
 	FindOneAndUpdate(collectionName string, filter bson.D, update bson.D) *mongo.SingleResult
 }
 
@@ -32,44 +32,33 @@ type mongoService struct{}
 //FindOne helper
 func (service *mongoService) FindOne(collectionName string, query bson.M) *mongo.SingleResult {
 	db := configs.DB().Collection(collectionName)
-	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	return db.FindOne(context, query)
+	return db.FindOne(ctx, query)
 }
 
 //List helper
-func (service *mongoService) List(collectionName string, query bson.D, modelToMap interface{}) ([]interface{}, error) {
+func (service *mongoService) List(collectionName string, query bson.D) (*mongo.Cursor, error) {
 	db := configs.DB().Collection(collectionName)
-	context, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	cursor, err := db.Find(context, query)
+	cursor, err := db.Find(ctx, query)
 	if err != nil {
 		return nil, err
 	}
-	defer cursor.Close(context)
-	var data []interface{}
-	for cursor.Next(context) {
-		if err := cursor.Decode(modelToMap); err != nil {
-			return nil, err
-		}
-		data = append(data, modelToMap)
-	}
-	if cursor.Err() != nil {
-		return nil, cursor.Err()
-	}
-	return data, nil
+	return cursor, nil
 }
 
 //InsertOne document in mongo
 func (service *mongoService) InsertOne(collectionName string, object interface{}) (primitive.ObjectID, error) {
 	db := configs.DB().Collection(collectionName)
-	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	entityModel, err := Flatten(object)
 	if err != nil {
 		return primitive.NilObjectID, err
 	}
-	result, err := db.InsertOne(context, entityModel)
+	result, err := db.InsertOne(ctx, entityModel)
 	if err != nil {
 		return primitive.NilObjectID, err
 	}
@@ -79,7 +68,7 @@ func (service *mongoService) InsertOne(collectionName string, object interface{}
 //FindOneAndUpdate helper
 func (service *mongoService) FindOneAndUpdate(collectionName string, filter bson.D, update bson.D) *mongo.SingleResult {
 	collection := configs.DB().Collection(collectionName)
-	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	return collection.FindOneAndUpdate(context, filter, update)
+	return collection.FindOneAndUpdate(ctx, filter, update)
 }

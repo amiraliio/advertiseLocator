@@ -6,7 +6,6 @@ import (
 
 //TODO validation for enums in request
 
-
 type Advertise struct {
 	Location    *models.Location         `json:"location" validate:"required"`
 	Tags        []*models.Tag            `json:"tags" validate:"required,unique,max=200"`
