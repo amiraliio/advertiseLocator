@@ -21,24 +21,26 @@ func CheckAPIKey(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(request echo.Context) error {
 		xAPIKey := request.Request().Header.Get(models.APIKeyHeaderKey)
 		if xAPIKey == "" {
-			return helpers.ResponseError(request,
-				http.StatusForbidden,
-				helpers.AuthTarget,
-				http.StatusText(http.StatusForbidden),
+			return helpers.ResponseError(
+				request,
+				http.StatusUnauthorized,
+				helpers.AccessTarget,
+				http.StatusText(http.StatusUnauthorized),
 				"M1000",
 				helpers.ApiKeyTarget,
-				lang.MustSetValidAPIKey)
+				lang.MustSetValidAPIKey,
+			)
 		}
 		dataKey, err := helpers.DecodeToken(xAPIKey)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+			return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 		}
 		expireTime, err := strconv.Atoi(os.Getenv("API_KEY_TOKEN_EXPIRE_DAY"))
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 		if dataKey.CreatedAt < primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, -expireTime)) {
-			return echo.NewHTTPError(http.StatusForbidden, lang.TheAPIKeyExpired)
+			return echo.NewHTTPError(http.StatusUnauthorized, lang.TheAPIKeyExpired)
 		}
 		request.Set(models.APIKeyHeaderKey, dataKey)
 		return next(request)

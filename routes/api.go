@@ -10,7 +10,7 @@ import (
 var (
 	apiV1     *echo.Group = configs.Server.Group("/api/v1")
 	auth      *echo.Group = apiV1.Group("/auth", middleware.CheckAPIKey)
-	advertise *echo.Group = apiV1.Group("/advertise", middleware.CheckAPIKey)
+	advertise *echo.Group = apiV1.Group("/advertises", middleware.CheckAPIKey)
 )
 
 //API routes

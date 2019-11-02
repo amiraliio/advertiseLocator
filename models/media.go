@@ -22,7 +22,7 @@ const (
 //BaseMedia model
 type BaseMedia struct {
 	OriginalURL string `json:"originalURL" bson:"originalURL"`
-	URL         string `json:"url" bson:"url"`
+	URL         string `json:"url" bson:"url" validate:"required,min=10,max=1000"`
 	Type        string `json:"type" bson:"type"`
 }
 
@@ -45,8 +45,8 @@ type Video struct {
 //AdvertiseImage model
 type AdvertiseImage struct {
 	Image    ",inline"
-	IsMain   bool   `json:"isMain" bson:"isMain"`
-	Caption  string `json:"caption" bson:"caption"`
-	Show     bool   `json:"show" bson:"show"`
-	Priority byte   `json:"priority" bson:"priority"`
+	IsMain   bool   `json:"isMain" bson:"isMain" validate:"omitempty"`
+	Caption  string `json:"caption" bson:"caption" validate:"omitempty,min=10,max=255"`
+	Show     bool   `json:"show" bson:"show" validate:"required"`
+	Priority byte   `json:"priority" bson:"priority" validate:"required,numeric,max=3"`
 }

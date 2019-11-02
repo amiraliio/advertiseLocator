@@ -34,6 +34,7 @@ const (
 	QueryTarget  string = "Query"
 	AuthTarget   string = "Authentication"
 	ApiKeyTarget string = "APIKey"
+	AccessTarget string = "Access"
 )
 
 type ResponseModel struct {
