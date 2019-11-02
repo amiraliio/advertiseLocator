@@ -8,15 +8,25 @@ import (
 )
 
 var (
-	apiV1 *echo.Group = configs.Server.Group("/api/v1")
-	auth  *echo.Group = apiV1.Group("/auth")
+	apiV1     *echo.Group = configs.Server.Group("/api/v1")
+	auth      *echo.Group = apiV1.Group("/auth", middleware.CheckAPIKey)
+	advertise *echo.Group = apiV1.Group("/advertise", middleware.CheckAPIKey)
 )
 
 //API routes
 func API() {
+	//generate api keys
 	apiV1.POST("/x-api-key", controllers.GenerateAPIKey).Name = "api-v1-generate-x-api-key"
 
-	auth.Use(middleware.CheckAPIKey)
+	//auth routes
 	auth.POST("/person-register", controllers.PersonRegister).Name = "api-v1-auth-person-register"
 	auth.POST("/person-login", controllers.PersonLogin).Name = "api-v1-auth-person-login"
+
+	//advertise crud
+	advertise.POST("/", controllers.AddAdvertise).Name = "api-v1-add-advertise"
+	advertise.GET("/", controllers.GetAdvertise).Name = "api-v1-get-advertise"
+	advertise.GET("/", controllers.ListOfAdvertises).Name = "api-v1-list-advertise"
+	advertise.DELETE("/", controllers.DeleteAdvertise).Name = "api-v1-delete-advertise"
+	advertise.PUT("/", controllers.UpdateAdvertise).Name = "api-v1-update-advertise"
+
 }
