@@ -79,11 +79,14 @@ func CheckIsPerson(next echo.HandlerFunc) echo.HandlerFunc {
 		if data.CreatedAt < primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, -expireDate)) {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Token Expired")
 		}
-		apiModel := new(models.API)
-		apiModel.CreatedAt = data.CreatedAt
-		apiModel.Key = data.Key
-		apiModel.Type = data.Type
-		request.Set("authData", apiModel)
+		client := new(models.Client)
+		client.CreatedAt = data.CreatedAt
+		objectID, err := primitive.ObjectIDFromHex(data.Key)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		client.ID = objectID
+		request.Set(models.AuthorizationHeaderKey, client)
 		return next(request)
 	}
 }

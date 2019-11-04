@@ -144,7 +144,7 @@ func clientMapper(request echo.Context, auth *models.Auth, clientRequest *reques
 		return nil, err
 	}
 	client.RefreshToken = refreshToken.Token
-	clientToken, err := helpers.EncodeToken(auth.UserID.String(), models.PersonUserType, os.Getenv("CLIENT_TOKEN_EXPIRE_DAY"))
+	clientToken, err := helpers.EncodeToken(auth.UserID.Hex(), models.PersonUserType, os.Getenv("CLIENT_TOKEN_EXPIRE_DAY"))
 	if err != nil {
 		return nil, err
 	}

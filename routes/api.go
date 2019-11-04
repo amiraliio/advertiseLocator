@@ -24,7 +24,7 @@ func API() {
 
 	//advertise crud
 	advertise.POST("", controllers.AddAdvertise, middleware.CheckIsPerson).Name = "api-v1-add-advertise"
-	advertise.GET("", controllers.ListOfAdvertises).Name = "api-v1-list-advertise"
+	advertise.GET("", controllers.ListOfAdvertises, middleware.CheckIsPerson).Name = "api-v1-list-advertise"
 	advertise.GET("/:id", controllers.GetAdvertise).Name = "api-v1-get-advertise"
 	advertise.DELETE("/:id", controllers.DeleteAdvertise).Name = "api-v1-delete-advertise"
 	advertise.PUT("/:id", controllers.UpdateAdvertise).Name = "api-v1-update-advertise"

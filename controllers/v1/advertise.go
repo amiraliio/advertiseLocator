@@ -20,6 +20,18 @@ func advertiseRepository() repositories.AdvertiseInterface {
 }
 
 func AddAdvertise(request echo.Context) (err error) {
+	authData := request.Get(models.AuthorizationHeaderKey)
+	if !helpers.IsInstance(authData, (*models.Client)(nil)) {
+		return helpers.ResponseError(
+			request,
+			http.StatusBadRequest,
+			helpers.InsertTarget,
+			http.StatusText(http.StatusBadRequest),
+			"CA1001",
+			"Insert Advertise",
+			err.Error(),
+		)
+	}
 	advertiseRequest := new(requests.Advertise)
 	if err = request.Bind(advertiseRequest); err != nil {
 		return helpers.ResponseError(
@@ -27,18 +39,19 @@ func AddAdvertise(request echo.Context) (err error) {
 			http.StatusBadRequest,
 			helpers.InsertTarget,
 			http.StatusText(http.StatusBadRequest),
-			"CA1000",
+			"CA1002",
 			"Insert Advertise",
 			err.Error(),
 		)
 	}
 	if err = request.Validate(advertiseRequest); err != nil {
-		return helpers.ResponseError( //TODO problem validation error response
+		//TODO problem validation error response
+		return helpers.ResponseError(
 			request,
 			http.StatusUnprocessableEntity,
 			helpers.InsertTarget,
 			http.StatusText(http.StatusUnprocessableEntity),
-			"CA1001",
+			"CA1003",
 			"Insert Advertise",
 			err.Error(),
 		)
@@ -48,11 +61,11 @@ func AddAdvertise(request echo.Context) (err error) {
 	advertiseID := primitive.NewObjectID()
 	advertise.ID = advertiseID
 	advertise.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
-	advertise.CreatedBy = primitive.NilObjectID //TODO must change to user id
+	advertise.CreatedBy = authData.(*models.Client).ID
 	advertise.Location = advertiseRequest.Location
 	advertise.Tags = advertiseRequest.Tags
 	person := new(models.Person)
-	person.ID = primitive.NilObjectID //TODO must change to user id
+	person.ID = authData.(*models.Client).ID
 	advertise.Advertiser = person
 	advertise.Radius = advertiseRequest.Radius
 	advertise.Images = advertiseRequest.Images
@@ -66,7 +79,7 @@ func AddAdvertise(request echo.Context) (err error) {
 			http.StatusBadRequest,
 			helpers.InsertTarget,
 			http.StatusText(http.StatusBadRequest),
-			"CA1002",
+			"CA1004",
 			"Insert Advertise",
 			err.Error(),
 		)
@@ -82,7 +95,7 @@ func ListOfAdvertises(request echo.Context) (err error) {
 			http.StatusBadRequest,
 			helpers.QueryTarget,
 			http.StatusText(http.StatusBadRequest),
-			"CA1003",
+			"CA1005",
 			"List Of Advertise",
 			err.Error(),
 		)
