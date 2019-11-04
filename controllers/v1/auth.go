@@ -138,10 +138,7 @@ func clientMapper(request echo.Context, auth *models.Auth, clientRequest *reques
 	client.OSType = clientRequest.OsType
 	client.OSVersion = clientRequest.OsVersion
 	client.LastLogin = primitive.NewDateTimeFromTime(time.Now())
-	client.API.Key = xAPIKeyData.Key
-	client.API.ExpireDate = xAPIKeyData.ExpireDate
-	client.API.Type = xAPIKeyData.Type
-	client.API.CreatedAt = xAPIKeyData.CreatedAt
+	client.API = xAPIKeyData
 	refreshToken, err := helpers.EncodeToken(uuid.New().String(), models.PersonUserType, os.Getenv("CLIENT_TOKEN_EXPIRE_DAY"))
 	if err != nil {
 		return nil, err
