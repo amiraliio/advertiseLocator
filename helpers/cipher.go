@@ -12,15 +12,24 @@ import (
 	"strings"
 	"time"
 
-	"github.com/amiraliio/advertiselocator/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
 
+//TODO inner struct instead of modles.API for both client and apikey
+
 const tokenSplitter string = "_"
 
+type Cipher struct {
+	Key        string
+	Type       string
+	Token      string
+	CreatedAt  primitive.DateTime
+	ExpireDate primitive.DateTime
+}
+
 //EncodeToken encode
-func EncodeToken(id, tokenType, expire string) (*models.API, error) {
+func EncodeToken(id, tokenType, expire string) (*Cipher, error) {
 	createdAt := time.Now()
 	token := []byte(id + tokenSplitter + tokenType + tokenSplitter + strconv.FormatInt(createdAt.Unix(), 10))
 	block, err := aes.NewCipher([]byte(os.Getenv("APP_KEY")))
@@ -37,7 +46,7 @@ func EncodeToken(id, tokenType, expire string) (*models.API, error) {
 	cfb := cipher.NewCFBEncrypter(block, iv)
 	cfb.XORKeyStream(cipherText[aes.BlockSize:], token)
 	tokenInBase64 := base64.StdEncoding.EncodeToString(cipherText)
-	encryptedToken := new(models.API)
+	encryptedToken := new(Cipher)
 	encryptedToken.Token = tokenInBase64
 	encryptedToken.CreatedAt = primitive.NewDateTimeFromTime(createdAt)
 	expireTime, err := strconv.Atoi(expire)
@@ -49,7 +58,7 @@ func EncodeToken(id, tokenType, expire string) (*models.API, error) {
 }
 
 //DecodeToken decode
-func DecodeToken(token string) (*models.API, error) {
+func DecodeToken(token string) (*Cipher, error) {
 	tokenInByte, err := base64.StdEncoding.DecodeString(token)
 	if err != nil {
 		return nil, err
@@ -67,8 +76,8 @@ func DecodeToken(token string) (*models.API, error) {
 	cfb.XORKeyStream(tokenInByte, tokenInByte)
 	token = string(tokenInByte)
 	splittedToken := strings.Split(token, tokenSplitter)
-	if splittedToken != nil && len(splittedToken) == 3 {
-		decryptedToken := new(models.API)
+	if len(splittedToken) == 3 {
+		decryptedToken := new(Cipher)
 		decryptedToken.Key = splittedToken[0]
 		decryptedToken.Type = splittedToken[1]
 		timestamp, err := strconv.ParseInt(splittedToken[2], 10, 64)
@@ -92,8 +101,7 @@ func HashPassword(password string) (string, error) {
 
 //CheckPasswordHash handler
 func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	if err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)); err != nil {
 		return false
 	}
 	return true

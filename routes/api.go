@@ -23,7 +23,7 @@ func API() {
 	auth.POST("/person-login", controllers.PersonLogin).Name = "api-v1-auth-person-login"
 
 	//advertise crud
-	advertise.POST("", controllers.AddAdvertise).Name = "api-v1-add-advertise"
+	advertise.POST("", controllers.AddAdvertise, middleware.CheckIsPerson).Name = "api-v1-add-advertise"
 	advertise.GET("", controllers.ListOfAdvertises).Name = "api-v1-list-advertise"
 	advertise.GET("/:id", controllers.GetAdvertise).Name = "api-v1-get-advertise"
 	advertise.DELETE("/:id", controllers.DeleteAdvertise).Name = "api-v1-delete-advertise"
