@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"net/http"
 	"errors"
+	"net/http"
 	"time"
 
 	"github.com/amiraliio/advertiselocator/helpers"
@@ -22,17 +22,17 @@ func advertiseRepository() repositories.AdvertiseInterface {
 
 //TODO move to a base place
 func authData(request echo.Context) (*models.Client, error) {
-	authData := request.Get(models.AuthorizationHeaderKey)
-	if !helpers.IsInstance(authData, (*models.Client)(nil)) {
+	auth := request.Get(models.AuthorizationHeaderKey)
+	if !helpers.IsInstance(auth, (*models.Client)(nil)) {
 		return nil, errors.New("auth need")
 	}
-	return authData.(*models.Client), nil
+	return auth.(*models.Client), nil
 }
 
 //AddAdvertise controller
 func AddAdvertise(request echo.Context) (err error) {
 	authData, err := authData(request)
-	if err !=nil{
+	if err != nil {
 		return helpers.ResponseError(request, http.StatusBadRequest, helpers.InsertTarget, http.StatusText(http.StatusBadRequest), "CA1001", "Find Advertise", "Auth data must be instance of client model")
 	}
 	advertiseRequest := new(requests.Advertise)
@@ -69,7 +69,7 @@ func AddAdvertise(request echo.Context) (err error) {
 //ListOfAdvertises controller
 func ListOfAdvertises(request echo.Context) (err error) {
 	authData, err := authData(request)
-	if err !=nil{
+	if err != nil {
 		return helpers.ResponseError(request, http.StatusBadRequest, helpers.InsertTarget, http.StatusText(http.StatusBadRequest), "CA1001", "Find Advertise", "Auth data must be instance of client model")
 	}
 	// queries := request.QueryParams()
@@ -85,7 +85,7 @@ func ListOfAdvertises(request echo.Context) (err error) {
 //GetAdvertise controller
 func GetAdvertise(request echo.Context) (err error) {
 	authData, err := authData(request)
-	if err !=nil{
+	if err != nil {
 		return helpers.ResponseError(request, http.StatusBadRequest, helpers.InsertTarget, http.StatusText(http.StatusBadRequest), "CA1001", "Find Advertise", "Auth data must be instance of client model")
 	}
 	filter := new(models.AdvertiseFilter)
