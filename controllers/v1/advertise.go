@@ -19,53 +19,36 @@ func advertiseRepository() repositories.AdvertiseInterface {
 	return new(repositories.AdvertiseRepository)
 }
 
-func AddAdvertise(request echo.Context) (err error) {
+//TODO move to a base place
+func authData(request echo.Context) (*models.Client, error) {
 	authData := request.Get(models.AuthorizationHeaderKey)
 	if !helpers.IsInstance(authData, (*models.Client)(nil)) {
-		return helpers.ResponseError(
-			request,
-			http.StatusBadRequest,
-			helpers.InsertTarget,
-			http.StatusText(http.StatusBadRequest),
-			"CA1001",
-			"Insert Advertise",
-			err.Error(),
-		)
+		return nil, helpers.ResponseError(request, http.StatusBadRequest, helpers.InsertTarget, http.StatusText(http.StatusBadRequest), "CA1001", "Insert Advertise", "Auth data must be instance of client model")
 	}
+	return authData.(*models.Client), nil
+}
+
+//AddAdvertise controller
+func AddAdvertise(request echo.Context) (err error) {
+	authData, _ := authData(request)
 	advertiseRequest := new(requests.Advertise)
 	if err = request.Bind(advertiseRequest); err != nil {
-		return helpers.ResponseError(
-			request,
-			http.StatusBadRequest,
-			helpers.InsertTarget,
-			http.StatusText(http.StatusBadRequest),
-			"CA1002",
-			"Insert Advertise",
-			err.Error(),
-		)
+		return helpers.ResponseError(request, http.StatusBadRequest, helpers.InsertTarget, http.StatusText(http.StatusBadRequest), "CA1002", "Insert Advertise", err.Error())
 	}
 	if err = request.Validate(advertiseRequest); err != nil {
 		//TODO problem validation error response
-		return helpers.ResponseError(
-			request,
-			http.StatusUnprocessableEntity,
-			helpers.InsertTarget,
-			http.StatusText(http.StatusUnprocessableEntity),
-			"CA1003",
-			"Insert Advertise",
-			err.Error(),
-		)
+		return helpers.ResponseError(request, http.StatusUnprocessableEntity, helpers.InsertTarget, http.StatusText(http.StatusUnprocessableEntity), "CA1003", "Insert Advertise", err.Error())
 	}
 	advertise := new(models.Advertise)
 	advertise.Status = models.ActiveStatus
 	advertiseID := primitive.NewObjectID()
 	advertise.ID = advertiseID
 	advertise.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
-	advertise.CreatedBy = authData.(*models.Client).UserID
+	advertise.CreatedBy = authData.UserID
 	advertise.Location = advertiseRequest.Location
 	advertise.Tags = advertiseRequest.Tags
 	person := new(models.Person)
-	person.ID = authData.(*models.Client).UserID
+	person.ID = authData.UserID
 	advertise.Advertiser = person
 	advertise.Radius = advertiseRequest.Radius
 	advertise.Images = advertiseRequest.Images
@@ -74,52 +57,39 @@ func AddAdvertise(request echo.Context) (err error) {
 	advertise.Visibility = advertiseRequest.Visibility
 	result, err := advertiseRepository().InsertAdvertise(advertise)
 	if err != nil {
-		return helpers.ResponseError(
-			request,
-			http.StatusBadRequest,
-			helpers.InsertTarget,
-			http.StatusText(http.StatusBadRequest),
-			"CA1004",
-			"Insert Advertise",
-			err.Error(),
-		)
+		return helpers.ResponseError(request, http.StatusBadRequest, helpers.InsertTarget, http.StatusText(http.StatusBadRequest), "CA1004", "Insert Advertise", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusCreated, result)
 }
 
+//ListOfAdvertises controller
 func ListOfAdvertises(request echo.Context) (err error) {
-	auth := request.Get(models.AuthorizationHeaderKey)
-	if !helpers.IsInstance(auth, (*models.Client)(nil)) {
-		return helpers.ResponseError(
-			request,
-			http.StatusBadRequest,
-			helpers.QueryTarget,
-			http.StatusText(http.StatusBadRequest),
-			"CA1006",
-			"List Advertise",
-			err.Error(),
-		)
-	}
+	authData, _ := authData(request)
 	// queries := request.QueryParams()
 	filter := new(models.AdvertiseFilter)
-	filter.UserID = auth.(*models.Client).UserID
+	filter.UserID = authData.UserID
 	results, err := advertiseRepository().ListOfAdvertise(filter)
 	if err != nil {
-		return helpers.ResponseError(
-			request,
-			http.StatusBadRequest,
-			helpers.QueryTarget,
-			http.StatusText(http.StatusBadRequest),
-			"CA1005",
-			"List Of Advertise",
-			err.Error(),
-		)
+		return helpers.ResponseError(request, http.StatusBadRequest, helpers.QueryTarget, http.StatusText(http.StatusBadRequest), "CA1005", "List Of Advertise", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusOK, results)
 }
 
+//GetAdvertise controller
 func GetAdvertise(request echo.Context) (err error) {
-	return nil
+	authData, _ := authData(request)
+	filter := new(models.AdvertiseFilter)
+	filter.UserID = authData.UserID
+	objectId, err := primitive.ObjectIDFromHex(request.Param("id"))
+	if err != nil {
+		return helpers.ResponseError(request, http.StatusBadRequest, helpers.QueryTarget, http.StatusText(http.StatusBadRequest), "CA1007", "Get Advertise", err.Error())
+	}
+	filter.ID = objectId
+	results, err := advertiseRepository().FindOne(filter)
+	if err != nil {
+		return helpers.ResponseError(request, http.StatusBadRequest, helpers.QueryTarget, http.StatusText(http.StatusBadRequest), "CA1008", "Get Advertise", err.Error())
+	}
+	return helpers.ResponseOk(request, http.StatusOK, results)
 }
 
 func DeleteAdvertise(request echo.Context) (err error) {

@@ -89,12 +89,10 @@ func checkUserExistOrNot(auth *models.Auth) (bool, error) {
 }
 
 //GetAuthData with auth value
-func (service *AuthService) GetAuthData(authValue string) (*models.Auth, error) {
+func (service *AuthService) GetAuthData(authValue string) (auth *models.Auth, err error) {
 	query := bson.M{"value": authValue, "status": models.ActiveStatus}
-	var result *models.Auth
-	err := helpers.Mongo().FindOne(models.AuthCollection, query).Decode(&result)
-	if err != nil {
+	if err = helpers.Mongo().FindOne(models.AuthCollection, query).Decode(&auth); err != nil {
 		return nil, err
 	}
-	return result, nil
+	return auth, nil
 }

@@ -6,12 +6,12 @@ import (
 
 //BaseFilter filter
 type BaseFilter struct {
-	FromDate primitive.DateTime `json:"fromDate" query:"fromDate" bson:"fromDate"`
-	ToDate   primitive.DateTime `json:"toDate" query:"toDate" bson:"toDate"`
-	UserID   primitive.ObjectID `json:"userID" query:"userID" bson:"userID"`
-	Sort     string             `json:"sort" bson:"sort"`
-	Page     uint16             `json:"page"`
-	Limit    uint16             `json:"limit"`
+	CreatedAt primitive.DateTime `json:"createdAt" query:"createdAt" bson:"createdAt"`
+	UserID    primitive.ObjectID `json:"userID" bson:"userID"`
+	ID        primitive.ObjectID `json:"id" bson:"_id"`
+	Sort      string             `json:"sort" query:"sort" bson:"sort"`
+	Page      uint16             `json:"page" query:"page"`
+	Limit     uint16             `json:"limit" query:"limit"`
 }
 
 //TagFilter filter

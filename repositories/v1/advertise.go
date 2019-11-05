@@ -11,6 +11,7 @@ import (
 type AdvertiseInterface interface {
 	InsertAdvertise(advertise *models.Advertise) (*models.Advertise, error)
 	ListOfAdvertise(filter *models.AdvertiseFilter) ([]*models.Advertise, error)
+	FindOne(filter *models.AdvertiseFilter) (advertise *models.Advertise, err error)
 }
 
 type AdvertiseRepository struct{}
@@ -50,4 +51,12 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 		return nil, cursor.Err()
 	}
 	return data, nil
+}
+
+func (service *AdvertiseRepository) FindOne(filter *models.AdvertiseFilter) (advertise *models.Advertise, err error) {
+	query := bson.M{"_id": filter.ID, "person._id": filter.UserID}
+	if err = helpers.Mongo().FindOne(models.AdvertiseCollection, query).Decode(&advertise); err != nil {
+		return nil, err
+	}
+	return advertise, nil
 }
