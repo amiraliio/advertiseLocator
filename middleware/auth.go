@@ -85,7 +85,7 @@ func CheckIsPerson(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
-		client.ID = objectID
+		client.UserID = objectID
 		request.Set(models.AuthorizationHeaderKey, client)
 		return next(request)
 	}

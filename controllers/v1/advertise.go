@@ -61,11 +61,11 @@ func AddAdvertise(request echo.Context) (err error) {
 	advertiseID := primitive.NewObjectID()
 	advertise.ID = advertiseID
 	advertise.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
-	advertise.CreatedBy = authData.(*models.Client).ID
+	advertise.CreatedBy = authData.(*models.Client).UserID
 	advertise.Location = advertiseRequest.Location
 	advertise.Tags = advertiseRequest.Tags
 	person := new(models.Person)
-	person.ID = authData.(*models.Client).ID
+	person.ID = authData.(*models.Client).UserID
 	advertise.Advertiser = person
 	advertise.Radius = advertiseRequest.Radius
 	advertise.Images = advertiseRequest.Images
@@ -88,7 +88,22 @@ func AddAdvertise(request echo.Context) (err error) {
 }
 
 func ListOfAdvertises(request echo.Context) (err error) {
-	results, err := advertiseRepository().ListOfAdvertise()
+	auth := request.Get(models.AuthorizationHeaderKey)
+	if !helpers.IsInstance(auth, (*models.Client)(nil)) {
+		return helpers.ResponseError(
+			request,
+			http.StatusBadRequest,
+			helpers.QueryTarget,
+			http.StatusText(http.StatusBadRequest),
+			"CA1006",
+			"List Advertise",
+			err.Error(),
+		)
+	}
+	// queries := request.QueryParams()
+	filter := new(models.AdvertiseFilter)
+	filter.UserID = auth.(*models.Client).UserID
+	results, err := advertiseRepository().ListOfAdvertise(filter)
 	if err != nil {
 		return helpers.ResponseError(
 			request,
@@ -100,7 +115,7 @@ func ListOfAdvertises(request echo.Context) (err error) {
 			err.Error(),
 		)
 	}
-	return helpers.ResponseOk(request, http.StatusCreated, results)
+	return helpers.ResponseOk(request, http.StatusOK, results)
 }
 
 func GetAdvertise(request echo.Context) (err error) {

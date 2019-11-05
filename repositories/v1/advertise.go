@@ -10,7 +10,7 @@ import (
 
 type AdvertiseInterface interface {
 	InsertAdvertise(advertise *models.Advertise) (*models.Advertise, error)
-	ListOfAdvertise() ([]*models.Advertise, error)
+	ListOfAdvertise(filter *models.AdvertiseFilter) ([]*models.Advertise, error)
 }
 
 type AdvertiseRepository struct{}
@@ -23,13 +23,13 @@ func (service *AdvertiseRepository) InsertAdvertise(advertise *models.Advertise)
 	return advertise, nil
 }
 
-func (service *AdvertiseRepository) ListOfAdvertise() ([]*models.Advertise, error) {
+func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilter) ([]*models.Advertise, error) {
 	//TODO query with person id from token
 	query := bson.D{
-		//bson.E{
-		//	Key:"person._id",
-		//	Value:
-		//},
+		bson.E{
+			Key:   "person._id",
+			Value: filter.UserID,
+		},
 	}
 	cursor, err := helpers.Mongo().List(models.AdvertiseCollection, query)
 	if err != nil {
