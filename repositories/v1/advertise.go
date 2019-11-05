@@ -12,6 +12,7 @@ type AdvertiseInterface interface {
 	InsertAdvertise(advertise *models.Advertise) (*models.Advertise, error)
 	ListOfAdvertise(filter *models.AdvertiseFilter) ([]*models.Advertise, error)
 	FindOne(filter *models.AdvertiseFilter) (advertise *models.Advertise, err error)
+	DeleteOne(filter *models.AdvertiseFilter) (int64, error)
 }
 
 type AdvertiseRepository struct{}
@@ -59,4 +60,13 @@ func (service *AdvertiseRepository) FindOne(filter *models.AdvertiseFilter) (adv
 		return nil, err
 	}
 	return advertise, nil
+}
+
+func (service *AdvertiseRepository) DeleteOne(filter *models.AdvertiseFilter) (int64, error) {
+	query := bson.M{"_id": filter.ID, "person._id": filter.UserID}
+	result, err := helpers.Mongo().DeleteOne(models.AdvertiseCollection, query)
+	if err != nil {
+		return 0, err
+	}
+	return result.DeletedCount, nil
 }

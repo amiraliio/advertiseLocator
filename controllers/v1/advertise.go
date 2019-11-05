@@ -86,7 +86,7 @@ func ListOfAdvertises(request echo.Context) (err error) {
 func GetAdvertise(request echo.Context) (err error) {
 	authData, err := authData(request)
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, helpers.InsertTarget, http.StatusText(http.StatusBadRequest), "CA1001", "Find Advertise", "Auth data must be instance of client model")
+		return helpers.ResponseError(request, http.StatusBadRequest, helpers.QueryTarget, http.StatusText(http.StatusBadRequest), "CA1001", "Find Advertise", "Auth data must be instance of client model")
 	}
 	filter := new(models.AdvertiseFilter)
 	filter.UserID = authData.UserID
@@ -103,9 +103,23 @@ func GetAdvertise(request echo.Context) (err error) {
 }
 
 func DeleteAdvertise(request echo.Context) (err error) {
-	return nil
-}
-
-func UpdateAdvertise(request echo.Context) (err error) {
-	return nil
+	authData, err := authData(request)
+	if err != nil {
+		return helpers.ResponseError(request, http.StatusBadRequest, helpers.DeleteTarget, http.StatusText(http.StatusBadRequest), "CA1001", "Delete Advertise", "Auth data must be instance of client model")
+	}
+	filter := new(models.AdvertiseFilter)
+	filter.UserID = authData.UserID
+	objectId, err := primitive.ObjectIDFromHex(request.Param("id"))
+	if err != nil {
+		return helpers.ResponseError(request, http.StatusBadRequest, helpers.DeleteTarget, http.StatusText(http.StatusBadRequest), "CA1009", "Delete Advertise", err.Error())
+	}
+	filter.ID = objectId
+	results, err := advertiseRepository().DeleteOne(filter)
+	if err != nil {
+		return helpers.ResponseError(request, http.StatusBadRequest, helpers.DeleteTarget, http.StatusText(http.StatusBadRequest), "CA1010", "Delete Advertise", err.Error())
+	}
+	if results == 0 {
+		return helpers.ResponseError(request, http.StatusBadRequest, helpers.DeleteTarget, http.StatusText(http.StatusBadRequest), "CA1013", "Delete Advertise", "Document for deleting doesn't exist")
+	}
+	return helpers.ResponseOk(request, http.StatusOK, "Deleted")
 }

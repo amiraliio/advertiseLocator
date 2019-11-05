@@ -27,6 +27,6 @@ func API() {
 	advertise.GET("", controllers.ListOfAdvertises, middleware.CheckIsPerson).Name = "api-v1-list-advertise"
 	advertise.GET("/:id", controllers.GetAdvertise, middleware.CheckIsPerson).Name = "api-v1-get-advertise"
 	advertise.DELETE("/:id", controllers.DeleteAdvertise, middleware.CheckIsPerson).Name = "api-v1-delete-advertise"
-	advertise.PUT("/:id", controllers.UpdateAdvertise, middleware.CheckIsPerson).Name = "api-v1-update-advertise"
+	// advertise.PUT("/:id", controllers.UpdateAdvertise, middleware.CheckIsPerson).Name = "api-v1-update-advertise"
 
 }

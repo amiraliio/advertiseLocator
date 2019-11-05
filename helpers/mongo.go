@@ -13,6 +13,7 @@ import (
 //TODO improvement must be just interface not function
 //TODO sort, filter, pagination for List
 //TODO complete this helper
+//TODO add variable in return types and remove : from variables
 
 //Mongo build
 func Mongo() MongoInterface {
@@ -25,6 +26,7 @@ type MongoInterface interface {
 	FindOne(collectionName string, query bson.M) *mongo.SingleResult
 	List(collectionName string, query bson.D) (*mongo.Cursor, error)
 	FindOneAndUpdate(collectionName string, filter bson.D, update bson.D) *mongo.SingleResult
+	DeleteOne(collectionName string, filter bson.M) (deleteResult *mongo.DeleteResult, err error)
 }
 
 type mongoService struct{}
@@ -71,4 +73,15 @@ func (service *mongoService) FindOneAndUpdate(collectionName string, filter bson
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	return collection.FindOneAndUpdate(ctx, filter, update)
+}
+
+func (service *mongoService) DeleteOne(collectionName string, filter bson.M) (deleteResult *mongo.DeleteResult, err error) {
+	collection := configs.DB().Collection(collectionName)
+	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	deleteResult, err = collection.DeleteOne(context, filter)
+	if err != nil {
+		return nil, err
+	}
+	return deleteResult, nil
 }
