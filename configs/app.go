@@ -15,7 +15,7 @@ const (
 
 //Init configs in the package main
 func Init() {
-	//set your initial config
+	//set your initial config in here
 }
 
 var (
@@ -28,8 +28,6 @@ func framework() (framework *echo.Echo) {
 	framework = echo.New()
 	//instance of custom validator
 	framework.Validator = &validation{validator: instantiateValidator()}
-	//custom error response handler
-	// framework.HTTPErrorHandler = customErrorHandler
 	//active logger
 	framework = logger(framework)
 	//Recover middleware recovers from panics anywhere in the chain, prints stack trace and handles the control to the centralized HTTPErrorHandler.
