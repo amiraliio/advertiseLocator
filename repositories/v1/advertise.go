@@ -2,10 +2,11 @@ package repositories
 
 import (
 	"context"
+	"time"
+
 	"github.com/amiraliio/advertiselocator/helpers"
 	"github.com/amiraliio/advertiselocator/models"
 	"go.mongodb.org/mongo-driver/bson"
-	"time"
 )
 
 type AdvertiseInterface interface {
