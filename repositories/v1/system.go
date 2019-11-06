@@ -5,16 +5,16 @@ import (
 	"github.com/amiraliio/advertiselocator/models"
 )
 
-//SystemRepository service
-type SystemRepository interface {
+//SystemInterface service
+type SystemInterface interface {
 	CreateAPIKey(api *models.API) (*models.API, error)
 }
 
-//SystemService service
-type SystemService struct{}
+//SystemRepository service
+type SystemRepository struct{}
 
 //CreateAPIKey service
-func (systemService *SystemService) CreateAPIKey(api *models.API) (*models.API, error) {
+func (systemService *SystemRepository) CreateAPIKey(api *models.API) (*models.API, error) {
 	_, err := helpers.Mongo().InsertOne(models.APIKeyCollection, api)
 	if err != nil {
 		return nil, err

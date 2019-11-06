@@ -16,12 +16,12 @@ import (
 //TODO detect user agent os to match apikey token and agent request
 //TODO dynamic generate internal code
 
-//CheckAPIKey middleware
+//CheckAPIKey middleware - check the requested
 func CheckAPIKey(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(request echo.Context) error {
 		xAPIKey := request.Request().Header.Get(models.APIKeyHeaderKey)
 		if xAPIKey == "" {
-			return helpers.ResponseError(request, http.StatusUnauthorized, helpers.AccessTarget, http.StatusText(http.StatusUnauthorized), "M1000", helpers.ApiKeyTarget, lang.MustSetValidAPIKey)
+			return helpers.ResponseError(request, http.StatusUnauthorized, helpers.AccessTarget, "M1000", helpers.ApiKeyTarget, lang.MustSetValidAPIKey)
 		}
 		dataKey, err := helpers.DecodeToken(xAPIKey)
 		if err != nil {
@@ -43,17 +43,27 @@ func CheckAPIKey(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+//CheckIsPerson middleware - checking the requested user is person or not and has access
 func CheckIsPerson(next echo.HandlerFunc) echo.HandlerFunc {
+	return userAccess(next, models.PersonUserType)
+}
+
+//CheckIsAdmin middleware - checking the requested user is admin or not and access
+func CheckIsAdmin(next echo.HandlerFunc) echo.HandlerFunc {
+	return userAccess(next, models.AdminUserType)
+}
+
+func userAccess(next echo.HandlerFunc, userType string) echo.HandlerFunc {
 	return func(request echo.Context) error {
 		auth := request.Request().Header.Get(models.AuthorizationHeaderKey)
 		if auth == "" {
-			return helpers.ResponseError(request, http.StatusUnauthorized, helpers.AccessTarget, http.StatusText(http.StatusUnauthorized), "M1001", helpers.AuthTarget, "Must be authenticated")
+			return helpers.ResponseError(request, http.StatusUnauthorized, helpers.AccessTarget, "M1001", helpers.AuthTarget, "Must be authenticated")
 		}
 		data, err := helpers.DecodeToken(auth)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 		}
-		if data.Type != models.PersonUserType {
+		if data.Type != userType {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Access denied")
 		}
 		expireDate, err := strconv.Atoi(os.Getenv("CLIENT_TOKEN_EXPIRE_DAY"))

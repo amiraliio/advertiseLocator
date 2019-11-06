@@ -2,15 +2,11 @@ package providers
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"os"
 
 	"github.com/amiraliio/advertiselocator/configs"
 	"github.com/amiraliio/advertiselocator/routes"
 )
-
-//TODO use echo logger
 
 //Init routes in the package main
 func initRoutes() {
@@ -23,7 +19,7 @@ func initRoutes() {
 func printRoutesToConsole() {
 	routes, err := json.MarshalIndent(configs.Server.Routes(), "", "  ")
 	if err != nil {
-		log.Println(err.Error())
+		configs.Server.Logger.Warn(err.Error())
 	}
-	fmt.Println(string(routes))
+	configs.Server.Logger.Print(string(routes))
 }

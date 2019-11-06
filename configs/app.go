@@ -1,7 +1,6 @@
 package configs
 
 import (
-	"log"
 	"os"
 	"strconv"
 
@@ -20,8 +19,8 @@ var (
 )
 
 //instantiate framework
-func framework() *echo.Echo {
-	framework := echo.New()
+func framework() (framework *echo.Echo) {
+	framework = echo.New()
 	//instance of custom validator
 	framework.Validator = &validation{validator: validator.New()}
 	//custom error response handler
@@ -29,7 +28,7 @@ func framework() *echo.Echo {
 	// Debug mode
 	debug, err := strconv.ParseBool(os.Getenv("SERVER_DEBUG"))
 	if err != nil {
-		log.Println(err.Error())
+		framework.Logger.Fatal(err.Error())
 	}
 	framework.Debug = debug
 	return framework

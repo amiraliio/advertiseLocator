@@ -11,17 +11,17 @@ import (
 //TODO transaction in mongodb for personRegister
 
 //AuthRepository interface
-type AuthRepository interface {
+type AuthInterface interface {
 	PersonRegister(person *models.Person, auth *models.Auth, client *models.Client) (*models.Client, error)
 	GetAuthData(authValue string) (*models.Auth, error)
 	InsertClient(client *models.Client) (primitive.ObjectID, error)
 }
 
-//AuthService repository
-type AuthService struct{}
+//AuthRepository repository
+type AuthRepository struct{}
 
 //PersonRegister method
-func (service *AuthService) PersonRegister(person *models.Person, auth *models.Auth, client *models.Client) (*models.Client, error) {
+func (service *AuthRepository) PersonRegister(person *models.Person, auth *models.Auth, client *models.Client) (*models.Client, error) {
 	userExist, err := checkUserExistOrNot(auth)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (service *AuthService) PersonRegister(person *models.Person, auth *models.A
 }
 
 //InsertClient func
-func (service *AuthService) InsertClient(client *models.Client) (primitive.ObjectID, error) {
+func (service *AuthRepository) InsertClient(client *models.Client) (primitive.ObjectID, error) {
 	filter := bson.D{
 		bson.E{
 			Key:   "userID",
@@ -69,7 +69,6 @@ func (service *AuthService) InsertClient(client *models.Client) (primitive.Objec
 			},
 		},
 	}
-
 	_ = helpers.Mongo().FindOneAndUpdate(models.ClientCollection, filter, update)
 	insertedID, err := helpers.Mongo().InsertOne(models.ClientCollection, client)
 	if err != nil {
@@ -89,7 +88,7 @@ func checkUserExistOrNot(auth *models.Auth) (bool, error) {
 }
 
 //GetAuthData with auth value
-func (service *AuthService) GetAuthData(authValue string) (auth *models.Auth, err error) {
+func (service *AuthRepository) GetAuthData(authValue string) (auth *models.Auth, err error) {
 	query := bson.M{"value": authValue, "status": models.ActiveStatus}
 	if err = helpers.Mongo().FindOne(models.AuthCollection, query).Decode(&auth); err != nil {
 		return nil, err

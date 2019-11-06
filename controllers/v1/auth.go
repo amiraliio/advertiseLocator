@@ -15,8 +15,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func authRepository() repositories.AuthRepository {
-	return new(repositories.AuthService)
+func authRepository() repositories.AuthInterface {
+	return new(repositories.AuthRepository)
 }
 
 //TODO BaseResponse
@@ -27,7 +27,7 @@ func PersonRegister(request echo.Context) (err error) {
 	//added from apikey middleware to context
 	xAPIKeyData := request.Get(models.APIKeyHeaderKey)
 	if !helpers.IsInstance(xAPIKeyData, (*models.API)(nil)) {
-		return helpers.ResponseError(request, http.StatusForbidden, helpers.ApiKeyTarget, http.StatusText(http.StatusForbidden), "C1000", "Verify API Key", "API key must be instance of API model")
+		return helpers.ResponseError(request, http.StatusForbidden, helpers.ApiKeyTarget, "C1000", "Verify API Key", "API key must be instance of API model")
 	}
 	registerRequest := new(requests.PersonRegister)
 	if err = request.Bind(registerRequest); err != nil {
@@ -79,7 +79,7 @@ func PersonLogin(request echo.Context) (err error) {
 	//added from apikey middleware to context
 	xAPIKeyData := request.Get(models.APIKeyHeaderKey)
 	if !helpers.IsInstance(xAPIKeyData, (*models.API)(nil)) {
-		return helpers.ResponseError(request, http.StatusForbidden, helpers.ApiKeyTarget, http.StatusText(http.StatusForbidden), "C1000", "Verify API Key", "API key must be instance of API model")
+		return helpers.ResponseError(request, http.StatusForbidden, helpers.ApiKeyTarget, "C1000", "Verify API Key", "API key must be instance of API model")
 	}
 	loginRequest := new(requests.PersonLogin)
 	if err = request.Bind(loginRequest); err != nil {

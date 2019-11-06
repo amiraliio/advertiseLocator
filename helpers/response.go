@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"github.com/labstack/echo/v4"
+	"net/http"
 	"strconv"
 )
 
@@ -67,10 +68,10 @@ type ErrorDetail struct {
 }
 
 //ErrorResponse helper
-func ResponseError(request echo.Context, httpCode int, httpTarget, httpMessage, internalCode, detailTarget, detailMessage string) error {
+func ResponseError(request echo.Context, httpCode int, httpTarget, internalCode, detailTarget, detailMessage string) error {
 	errorMessage := new(ErrorModel)
 	errorMessage.Code = httpCode
-	errorMessage.Message = httpMessage
+	errorMessage.Message = http.StatusText(httpCode)
 	errorMessage.Target = httpTarget
 	body := new(ErrorDetail)
 	body.Code = internalCode

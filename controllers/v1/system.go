@@ -25,8 +25,8 @@ import (
 //TODO change answer of errors
 //TODO must be admin id and read from token for created_by
 
-func getSystemRepo() repositories.SystemRepository {
-	return new(repositories.SystemService)
+func getSystemRepo() repositories.SystemInterface {
+	return new(repositories.SystemRepository)
 }
 
 //GenerateAPIKey controller
