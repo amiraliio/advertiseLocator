@@ -1,16 +1,26 @@
 package providers
 
+//this is improtant to first load environment autoload config
 import _ "github.com/joho/godotenv/autoload" //_ autoloaded config variables from .env file
 
-//TODO validate for env parameter
-//TODO for example .env app_key length must be 32 byte
+import (
+	"os"
+
+	"github.com/amiraliio/advertiselocator/configs"
+)
 
 //Start application and initialize application assets
 func Start() {
-	initRoutes()
 	register()
+	initRoutes()
 }
 
+//do what you want in startup in this method
 func register() {
-	//do what you want in startup in this method
+	if len(os.Getenv("APP_KEY")) != 32 {
+		configs.Server.Logger.Fatal("Length of APP_KEY must be 32 byte")
+	}
+	if os.Getenv("APP_ENV") != configs.DevelopEnvironment && os.Getenv("APP_ENV") != configs.ProductionEnvironment {
+		configs.Server.Logger.Fatal("APP_ENV must be one of the [ DEV, PRODUCTION ] ")
+	}
 }

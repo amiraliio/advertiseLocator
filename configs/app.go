@@ -6,7 +6,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	validator "gopkg.in/go-playground/validator.v9"
 )
 
 const (
@@ -28,7 +27,7 @@ var (
 func framework() (framework *echo.Echo) {
 	framework = echo.New()
 	//instance of custom validator
-	framework.Validator = &validation{validator: validator.New()}
+	framework.Validator = &validation{validator: instantiateValidator()}
 	//custom error response handler
 	// framework.HTTPErrorHandler = customErrorHandler
 	//active logger
