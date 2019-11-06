@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/amiraliio/advertiselocator/helpers"
@@ -27,7 +28,6 @@ func (service *AdvertiseRepository) InsertAdvertise(advertise *models.Advertise)
 }
 
 func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilter) ([]*models.Advertise, error) {
-	//TODO query with person id from token
 	query := bson.D{
 		bson.E{
 			Key:   "person._id",
@@ -68,6 +68,9 @@ func (service *AdvertiseRepository) DeleteOne(filter *models.AdvertiseFilter) (i
 	result, err := helpers.Mongo().DeleteOne(models.AdvertiseCollection, query)
 	if err != nil {
 		return 0, err
+	}
+	if result.DeletedCount == 0 {
+		return 0, errors.New("Document for deleting doesn't exist")
 	}
 	return result.DeletedCount, nil
 }

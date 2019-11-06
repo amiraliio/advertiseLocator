@@ -13,6 +13,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+//Notice: this controller detail error code start with CS which is abbreviation for Controller System
+//so each go file has their own unique code prefix, which implemented by responsibility + entity name
+
 //TODO must have admin access and without checkAPI middleware
 //TODO validation for type and request
 //TODO save API key per platform in mongo
@@ -31,32 +34,30 @@ func getSystemRepo() repositories.SystemInterface {
 
 //GenerateAPIKey controller
 func GenerateAPIKey(request echo.Context) (err error) {
-	requestAPIKey := new(requests.APIKey)
-	if err = request.Bind(requestAPIKey); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-	if err = request.Validate(requestAPIKey); err != nil {
-		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
-	}
-	uuid := uuid.New().String()
-	token, err := helpers.EncodeToken(uuid, requestAPIKey.Type, os.Getenv("API_KEY_TOKEN_EXPIRE_DAY"))
+	requestAPIKey, err := helpers.BindAndValidateRequest(request, new(requests.APIKey))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return helpers.ResponseError(request, http.StatusUnprocessableEntity, "CS-1000", "Validatation", err.Error())
+	}
+	requestModel := requestAPIKey.(*requests.APIKey)
+	uuid := uuid.New().String()
+	token, err := helpers.EncodeToken(uuid, requestModel.Type, os.Getenv("API_KEY_TOKEN_EXPIRE_DAY"))
+	if err != nil {
+		return helpers.ResponseError(request, http.StatusBadRequest, "CS-1001", "Encryption", err.Error())
 	}
 	api := new(models.API)
 	api.Key = uuid
-	api.Name = requestAPIKey.Name
+	api.Name = requestModel.Name
 	api.ExpireDate = token.ExpireDate
 	api.Token = token.Token
-	api.Type = requestAPIKey.Type
-	api.Description = requestAPIKey.Description
+	api.Type = requestModel.Type
+	api.Description = requestModel.Description
 	api.ID = primitive.NewObjectID()
 	api.Status = models.ActiveStatus
 	api.CreatedAt = token.CreatedAt
 	api.CreatedBy = primitive.NilObjectID
 	data, err := getSystemRepo().CreateAPIKey(api)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return helpers.ResponseError(request, http.StatusBadRequest, "CS-1002", "Insert API Key", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusCreated, data)
 }

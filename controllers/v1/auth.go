@@ -15,23 +15,22 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+//Notice: this controller detail error code start with CU which is abbreviation for Controller Auth
+//so each go file has their own unique code prefix, which implemented by responsibility + entity name
+
 func authRepository() repositories.AuthInterface {
 	return new(repositories.AuthRepository)
 }
 
-//TODO BaseResponse
-//return internal status code from repo
+//TODO return internal status code from repo
 
 //PersonRegister controller to register person
 func PersonRegister(request echo.Context) (err error) {
-	//added from apikey middleware to context
-	registerRequest := new(requests.PersonRegister)
-	if err = request.Bind(registerRequest); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	registerRequest, err := helpers.BindAndValidateRequest(request, new(requests.PersonRegister))
+	if err != nil {
+		return helpers.ResponseError(request, http.StatusUnprocessableEntity, "CU-1000", "Validate", err.Error())
 	}
-	if err = request.Validate(registerRequest); err != nil {
-		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
-	}
+	requestModel := registerRequest.(*requests.PersonRegister)
 	//person model
 	person := new(models.Person)
 	personID := primitive.NewObjectID()
@@ -40,7 +39,7 @@ func PersonRegister(request echo.Context) (err error) {
 	person.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	person.CreatedBy = personID
 	person.UserType = models.PersonUserType
-	person.Email = registerRequest.Email
+	person.Email = requestModel.Email
 	person.IP = request.RealIP()
 	//auth model
 	auth := new(models.Auth)
@@ -50,50 +49,47 @@ func PersonRegister(request echo.Context) (err error) {
 	auth.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	auth.CreatedBy = personID
 	auth.UserType = models.PersonUserType
-	auth.Value = registerRequest.Email
+	auth.Value = requestModel.Email
 	auth.IP = request.RealIP()
 	auth.UserID = personID
-	hashedPassword, err := helpers.HashPassword(registerRequest.Password)
+	hashedPassword, err := helpers.HashPassword(requestModel.Password)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return helpers.ResponseError(request, http.StatusBadRequest, "CU-1001", "Encrypt Password", err.Error())
 	}
 	auth.Password = hashedPassword
 	auth.Type = models.EmailAuthType
-	client, err := clientMapper(request, auth, registerRequest.Client, helpers.APIKeyData(request))
+	client, err := clientMapper(request, auth, requestModel.Client, helpers.APIKeyData(request))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return helpers.ResponseError(request, http.StatusBadRequest, "CU-1002", "Map Client", err.Error())
 	}
 	result, err := authRepository().PersonRegister(person, auth, client)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusConflict, err)
+		return helpers.ResponseError(request, http.StatusBadRequest, "CU-1003", "Register Person", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusCreated, result)
 }
 
 //PersonLogin controller
 func PersonLogin(request echo.Context) (err error) {
-	//added from apikey middleware to context
-	loginRequest := new(requests.PersonLogin)
-	if err = request.Bind(loginRequest); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-	if err = request.Validate(loginRequest); err != nil {
-		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
-	}
-	auth, err := authRepository().GetAuthData(loginRequest.Email)
+	loginRequest, err := helpers.BindAndValidateRequest(request, new(requests.PersonLogin))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNonAuthoritativeInfo, err.Error())
+		return helpers.ResponseError(request, http.StatusUnprocessableEntity, "CU-1004", "Validate", err.Error())
 	}
-	if !helpers.CheckPasswordHash(loginRequest.Password, auth.Password) {
-		return echo.NewHTTPError(http.StatusNonAuthoritativeInfo, "auth value or password is wrong")
-	}
-	client, err := clientMapper(request, auth, loginRequest.Client, helpers.APIKeyData(request))
+	requestModel := loginRequest.(*requests.PersonLogin)
+	auth, err := authRepository().GetAuthData(requestModel.Email)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return helpers.ResponseError(request, http.StatusNonAuthoritativeInfo, "CU-1005", "Fetch Auth Data", err.Error())
+	}
+	if !helpers.CheckPasswordHash(requestModel.Password, auth.Password) {
+		return helpers.ResponseError(request, http.StatusNonAuthoritativeInfo, "CU-1006", "Fetch Auth Data", "auth value or password is wrong")
+	}
+	client, err := clientMapper(request, auth, requestModel.Client, helpers.APIKeyData(request))
+	if err != nil {
+		return helpers.ResponseError(request, http.StatusBadRequest, "CU-1007", "Map client", err.Error())
 	}
 	_, err = authRepository().InsertClient(client)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return helpers.ResponseError(request, http.StatusBadRequest, "CU-1008", "Insert client", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusOK, client)
 }
