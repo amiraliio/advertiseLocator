@@ -21,5 +21,5 @@ func printRoutesToConsole() {
 	if err != nil {
 		configs.Server.Logger.Warn(err.Error())
 	}
-	configs.Server.Logger.Print(string(routes))
+	configs.Server.Logger.Printf("%v\n",string(routes))
 }
