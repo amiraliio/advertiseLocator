@@ -2,6 +2,7 @@ package providers
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/amiraliio/advertiselocator/configs"
@@ -21,5 +22,5 @@ func printRoutesToConsole() {
 	if err != nil {
 		configs.Server.Logger.Warn(err.Error())
 	}
-	configs.Server.Logger.Printf("%v\n",string(routes))
+	fmt.Println(string(routes))
 }
