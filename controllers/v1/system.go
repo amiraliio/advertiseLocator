@@ -39,13 +39,13 @@ func GenerateAPIKey(request echo.Context) (err error) {
 		return helpers.ResponseError(request, http.StatusUnprocessableEntity, "CS-1000", "Validatation", err.Error())
 	}
 	requestModel := requestAPIKey.(*requests.APIKey)
-	uuid := uuid.New().String()
-	token, err := helpers.EncodeToken(uuid, requestModel.Type, os.Getenv("API_KEY_TOKEN_EXPIRE_DAY"))
+	uuidAsString := uuid.New().String()
+	token, err := helpers.EncodeToken(uuidAsString, requestModel.Type, os.Getenv("API_KEY_TOKEN_EXPIRE_DAY"))
 	if err != nil {
 		return helpers.ResponseError(request, http.StatusBadRequest, "CS-1001", "Encryption", err.Error())
 	}
 	api := new(models.API)
-	api.Key = uuid
+	api.Key = uuidAsString
 	api.Name = requestModel.Name
 	api.ExpireDate = token.ExpireDate
 	api.Token = token.Token

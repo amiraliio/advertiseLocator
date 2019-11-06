@@ -70,7 +70,7 @@ func (service *AdvertiseRepository) DeleteOne(filter *models.AdvertiseFilter) (i
 		return 0, err
 	}
 	if result.DeletedCount == 0 {
-		return 0, errors.New("Document for deleting doesn't exist")
+		return 0, errors.New("document for deleting doesn't exist")
 	}
 	return result.DeletedCount, nil
 }

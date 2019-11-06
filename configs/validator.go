@@ -6,8 +6,8 @@ import (
 	"github.com/go-playground/locales"
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/universal-translator"
-	validator "gopkg.in/go-playground/validator.v9"
-	en_translations "gopkg.in/go-playground/validator.v9/translations/en"
+	"gopkg.in/go-playground/validator.v9"
+	enTranslations "gopkg.in/go-playground/validator.v9/translations/en"
 )
 
 var (
@@ -29,28 +29,48 @@ func instantiateValidator() *validator.Validate {
 		framework().Logger.Fatal("translator not found")
 	}
 	validate := validator.New()
-	if err := en_translations.RegisterDefaultTranslations(validate, translator); err != nil {
+	if err := enTranslations.RegisterDefaultTranslations(validate, translator); err != nil {
 		framework().Logger.Fatal(err.Error())
 	}
-	//required
-	customeRequiredMessage(validate)
-	return validate
+	return customMessages(validate)
 }
 
 func (v *validation) Validate(i interface{}) error {
-	err := v.validator.Struct(i)
-	//TODO change response error to []error
-	for _, e := range err.(validator.ValidationErrors) {
-		return errors.New(e.Translate(translator))
+	if err := v.validator.Struct(i); err != nil {
+		//TODO change response error to []error
+		for _, e := range err.(validator.ValidationErrors) {
+			return errors.New(e.Translate(translator))
+		}
 	}
 	return nil
 }
 
-func customeRequiredMessage(validate *validator.Validate) {
-	_ = validate.RegisterTranslation("required", translator, func(ut ut.Translator) error {
-		return ut.Add("required", "{0} is a required field", true)
-	}, func(ut ut.Translator, fe validator.FieldError) string {
-		t, _ := ut.T("required", fe.Field())
-		return t
-	})
+var j int
+
+func customMessages(validate *validator.Validate) *validator.Validate {
+	messages := map[string]string{
+		"required":  "is a required field",
+		"email":     "must be a valid email",
+		"unique":    "must be array of unique values",
+		"numeric":   "must be numeric",
+		"min":       "must follow minimum length",
+		"max":       "must follow maximum length",
+		"uuid":      "must be a valid uuid",
+		"latitude":  "must be a valid latitude",
+		"longitude": "must be a valid longitude",
+	}
+	for i, v := range messages {
+		if j == len(messages) {
+			break
+		}
+		_ = validate.RegisterTranslation(i, translator, func(ut ut.Translator) error {
+			return ut.Add(i, "{0} "+v, true)
+		}, func(ut ut.Translator, fe validator.FieldError) string {
+			t, _ := ut.T(i, fe.Field())
+			return t
+		})
+		j++
+		return customMessages(validate)
+	}
+	return validate
 }

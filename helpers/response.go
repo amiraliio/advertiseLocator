@@ -3,27 +3,10 @@ package helpers
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
-
-//sample of structure response
-// {
-//     "success": false,
-//     "error": {
-//         "code": 422,
-//         "target": "insert",
-//         "message": "unprocessable entity",
-//         "details": [
-//             {
-//                 "code": "m-1000",
-//                 "target": "password",
-//                 "message": "must be at least 8 character"
-//             }
-//         ]
-//     },
-//     "data": []
-// }
 
 //the error and response message model implemented according to the OASIS Standard incorporating Approved standard
 //referenced by link http://docs.oasis-open.org/odata/odata-json-format/v4.0/errata02/os/odata-json-format-v4.0-errata02-os-complete.html#_Toc403940655
@@ -91,7 +74,12 @@ func ResponseError(request echo.Context, httpCode int, internalCode, detailTarge
 	errorMessage.Target = httpTarget(httpCode, request.Request().Method)
 	body := new(ErrorDetail)
 	body.Code = internalCode
-	body.Target = detailTarget
+	if httpCode == http.StatusUnprocessableEntity && len(detailMessage) > 0 {
+		target := strings.Fields(detailMessage)
+		body.Target = target[0]
+	} else {
+		body.Target = detailTarget
+	}
 	body.Message = detailMessage
 	errorMessage.Details = append(errorMessage.Details, body)
 	response := new(ResponseModel)

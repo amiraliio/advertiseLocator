@@ -18,9 +18,9 @@ func initRoutes() {
 
 //print whole project routes in the startup console
 func printRoutesToConsole() {
-	routes, err := json.MarshalIndent(configs.Server.Routes(), "", "  ")
+	routesList, err := json.MarshalIndent(configs.Server.Routes(), "", "  ")
 	if err != nil {
 		configs.Server.Logger.Warn(err.Error())
 	}
-	fmt.Println(string(routes))
+	fmt.Println(string(routesList))
 }

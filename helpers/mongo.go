@@ -77,9 +77,9 @@ func (service *mongoService) FindOneAndUpdate(collectionName string, filter bson
 
 func (service *mongoService) DeleteOne(collectionName string, filter bson.M) (deleteResult *mongo.DeleteResult, err error) {
 	collection := configs.DB().Collection(collectionName)
-	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	deleteResult, err = collection.DeleteOne(context, filter)
+	deleteResult, err = collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return nil, err
 	}

@@ -28,7 +28,7 @@ func (service *AuthRepository) PersonRegister(person *models.Person, auth *model
 		return nil, err
 	}
 	if userExist {
-		return nil, errors.New("User with the requested email exist")
+		return nil, errors.New("user with the requested email exist")
 	}
 	//insert auth
 	_, err = helpers.Mongo().InsertOne(models.AuthCollection, auth)

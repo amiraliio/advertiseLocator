@@ -13,11 +13,6 @@ const (
 	ProductionEnvironment string = "PRODUCTION"
 )
 
-//Init configs in the package main
-func Init() {
-	//set your initial config in here
-}
-
 var (
 	//Server variable to use framework instance in the other packages
 	Server *echo.Echo = framework()
@@ -31,7 +26,7 @@ func framework() (framework *echo.Echo) {
 	//active logger
 	framework = logger(framework)
 	//Recover middleware recovers from panics anywhere in the chain, prints stack trace and handles the control to the centralized HTTPErrorHandler.
-	framework = recover(framework)
+	framework = trace(framework)
 	// Debug mode
 	framework = debugger(framework)
 	//active gzip if in production
@@ -56,12 +51,12 @@ func logger(framework *echo.Echo) *echo.Echo {
 	return framework
 }
 
-func recover(framework *echo.Echo) *echo.Echo {
-	recover, err := strconv.ParseBool(os.Getenv("ACTIVE_RECOVER"))
+func trace(framework *echo.Echo) *echo.Echo {
+	trace, err := strconv.ParseBool(os.Getenv("ACTIVE_RECOVER"))
 	if err != nil {
 		framework.Logger.Fatal(err.Error())
 	}
-	if recover {
+	if trace {
 		framework.Use(middleware.Recover())
 	}
 	return framework
