@@ -21,18 +21,18 @@ func CheckAPIKey(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(request echo.Context) error {
 		xAPIKey := request.Request().Header.Get(models.APIKeyHeaderKey)
 		if xAPIKey == "" {
-			return helpers.ResponseError(request, http.StatusUnauthorized, "M1000",helpers.AccessTarget, lang.MustSetValidAPIKey)
+			return helpers.ResponseError(request, http.StatusUnauthorized, "MA-1000", helpers.AccessTarget, lang.MustSetValidAPIKey)
 		}
 		dataKey, err := helpers.DecodeToken(xAPIKey)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+			return helpers.ResponseError(request, http.StatusUnauthorized, "MA-1001", "Decode API Key", lang.MustSetValidAPIKey)
 		}
 		expireTime, err := strconv.Atoi(os.Getenv("API_KEY_TOKEN_EXPIRE_DAY"))
 		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+			return helpers.ResponseError(request, http.StatusBadRequest, "MA-1002", "API Key Expire Time", err.Error())
 		}
 		if dataKey.CreatedAt < primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, -expireTime)) {
-			return echo.NewHTTPError(http.StatusUnauthorized, lang.TheAPIKeyExpired)
+			return helpers.ResponseError(request, http.StatusUnauthorized, "MA-1003", helpers.AccessTarget, lang.TheAPIKeyExpired)
 		}
 		apiModel := new(models.API)
 		apiModel.CreatedAt = dataKey.CreatedAt
@@ -57,27 +57,27 @@ func userAccess(next echo.HandlerFunc, userType string) echo.HandlerFunc {
 	return func(request echo.Context) error {
 		auth := request.Request().Header.Get(models.AuthorizationHeaderKey)
 		if auth == "" {
-			return helpers.ResponseError(request, http.StatusUnauthorized, "M1001", helpers.AccessTarget, "Must be authenticated")
+			return helpers.ResponseError(request, http.StatusUnauthorized, "MA-1004", helpers.AccessTarget, "Must be authenticated")
 		}
 		data, err := helpers.DecodeToken(auth)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+			return helpers.ResponseError(request, http.StatusUnauthorized, "MA-1005", helpers.AccessTarget, err.Error())
 		}
 		if data.Type != userType {
-			return echo.NewHTTPError(http.StatusUnauthorized, "Access denied")
+			return helpers.ResponseError(request, http.StatusUnauthorized, "MA-1006", helpers.AccessTarget, "Access denied")
 		}
 		expireDate, err := strconv.Atoi(os.Getenv("CLIENT_TOKEN_EXPIRE_DAY"))
 		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+			return helpers.ResponseError(request, http.StatusBadRequest, "MA-1007", "Client Expire Time", err.Error())
 		}
 		if data.CreatedAt < primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, -expireDate)) {
-			return echo.NewHTTPError(http.StatusUnauthorized, "Token Expired")
+			return helpers.ResponseError(request, http.StatusUnauthorized, "MA-1008", helpers.AccessTarget, "Token expired")
 		}
 		client := new(models.Client)
 		client.CreatedAt = data.CreatedAt
 		objectID, err := primitive.ObjectIDFromHex(data.Key)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+			return helpers.ResponseError(request, http.StatusBadRequest, "MA-1007", "Create ObjectID", err.Error())
 		}
 		client.UserID = objectID
 		request.Set(models.AuthorizationHeaderKey, client)
