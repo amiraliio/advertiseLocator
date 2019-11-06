@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
@@ -13,113 +12,80 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-//TODO check access just person can add advertise
-//TODO use controller service
-
 func advertiseRepository() repositories.AdvertiseInterface {
 	return new(repositories.AdvertiseRepository)
 }
 
-//TODO move to a base place
-func authData(request echo.Context) (*models.Client, error) {
-	auth := request.Get(models.AuthorizationHeaderKey)
-	if !helpers.IsInstance(auth, (*models.Client)(nil)) {
-		return nil, errors.New("auth need")
-	}
-	return auth.(*models.Client), nil
-}
-
 //AddAdvertise controller
-func AddAdvertise(request echo.Context) (err error) {
-	authData, err := authData(request)
+func AddAdvertise(request echo.Context) error {
+	advertiseRequest, err := helpers.BindAndValidateRequest(request, new(requests.Advertise))
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, helpers.InsertTarget, "CA1001", "Find Advertise", "Auth data must be instance of client model")
+		return helpers.ResponseError(request, http.StatusUnprocessableEntity, "CA1000", "Insert Advertise", err.Error())
 	}
-	advertiseRequest := new(requests.Advertise)
-	if err = request.Bind(advertiseRequest); err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, helpers.InsertTarget, "CA1002", "Insert Advertise", err.Error())
-	}
-	if err = request.Validate(advertiseRequest); err != nil {
-		//TODO problem validation error response
-		return helpers.ResponseError(request, http.StatusUnprocessableEntity, helpers.InsertTarget, "CA1003", "Insert Advertise", err.Error())
-	}
+	requestModel := advertiseRequest.(*requests.Advertise)
 	advertise := new(models.Advertise)
 	advertise.Status = models.ActiveStatus
-	advertiseID := primitive.NewObjectID()
-	advertise.ID = advertiseID
+	advertise.ID = primitive.NewObjectID()
 	advertise.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
-	advertise.CreatedBy = authData.UserID
-	advertise.Location = advertiseRequest.Location
-	advertise.Tags = advertiseRequest.Tags
+	advertise.CreatedBy = helpers.AuthData(request).UserID
 	person := new(models.Person)
-	person.ID = authData.UserID
+	person.ID = helpers.AuthData(request).UserID
 	advertise.Advertiser = person
-	advertise.Radius = advertiseRequest.Radius
-	advertise.Images = advertiseRequest.Images
-	advertise.Title = advertiseRequest.Title
-	advertise.Description = advertiseRequest.Description
-	advertise.Visibility = advertiseRequest.Visibility
+	advertise.Location = requestModel.Location
+	advertise.Tags = requestModel.Tags
+	advertise.Radius = requestModel.Radius
+	advertise.Images = requestModel.Images
+	advertise.Title = requestModel.Title
+	advertise.Description = requestModel.Description
+	advertise.Visibility = requestModel.Visibility
 	result, err := advertiseRepository().InsertAdvertise(advertise)
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, helpers.InsertTarget, "CA1004", "Insert Advertise", err.Error())
+		return helpers.ResponseError(request, http.StatusBadRequest, "CA1001", "Insert Advertise", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusCreated, result)
 }
 
 //ListOfAdvertises controller
 func ListOfAdvertises(request echo.Context) (err error) {
-	authData, err := authData(request)
-	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, helpers.InsertTarget, "CA1001", "Find Advertise", "Auth data must be instance of client model")
-	}
-	// queries := request.QueryParams()
 	filter := new(models.AdvertiseFilter)
-	filter.UserID = authData.UserID
+	filter.UserID = helpers.AuthData(request).UserID
 	results, err := advertiseRepository().ListOfAdvertise(filter)
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, helpers.QueryTarget, "CA1005", "List Of Advertise", err.Error())
+		return helpers.ResponseError(request, http.StatusBadRequest, "CA1005", "List Of Advertise", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusOK, results)
 }
 
 //GetAdvertise controller
 func GetAdvertise(request echo.Context) (err error) {
-	authData, err := authData(request)
-	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, helpers.QueryTarget, "CA1001", "Find Advertise", "Auth data must be instance of client model")
-	}
 	filter := new(models.AdvertiseFilter)
-	filter.UserID = authData.UserID
+	filter.UserID = helpers.AuthData(request).UserID
 	objectId, err := primitive.ObjectIDFromHex(request.Param("id"))
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, helpers.QueryTarget, "CA1007", "Get Advertise", err.Error())
+		return helpers.ResponseError(request, http.StatusBadRequest, "CA1007", "Get Advertise", err.Error())
 	}
 	filter.ID = objectId
 	results, err := advertiseRepository().FindOne(filter)
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, helpers.QueryTarget, "CA1008", "Get Advertise", err.Error())
+		return helpers.ResponseError(request, http.StatusBadRequest, "CA1008", "Get Advertise", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusOK, results)
 }
 
 func DeleteAdvertise(request echo.Context) (err error) {
-	authData, err := authData(request)
-	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, helpers.DeleteTarget, "CA1001", "Delete Advertise", "Auth data must be instance of client model")
-	}
 	filter := new(models.AdvertiseFilter)
-	filter.UserID = authData.UserID
+	filter.UserID = helpers.AuthData(request).UserID
 	objectId, err := primitive.ObjectIDFromHex(request.Param("id"))
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, helpers.DeleteTarget, "CA1009", "Delete Advertise", err.Error())
+		return helpers.ResponseError(request, http.StatusBadRequest, "CA1009", "Delete Advertise", err.Error())
 	}
 	filter.ID = objectId
 	results, err := advertiseRepository().DeleteOne(filter)
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, helpers.DeleteTarget, "CA1010", "Delete Advertise", err.Error())
+		return helpers.ResponseError(request, http.StatusBadRequest, "CA1010", "Delete Advertise", err.Error())
 	}
 	if results == 0 {
-		return helpers.ResponseError(request, http.StatusBadRequest, helpers.DeleteTarget, "CA1013", "Delete Advertise", "Document for deleting doesn't exist")
+		return helpers.ResponseError(request, http.StatusBadRequest, "CA1013", "Delete Advertise", "Document for deleting doesn't exist")
 	}
 	return helpers.ResponseOk(request, http.StatusOK, "Deleted")
 }

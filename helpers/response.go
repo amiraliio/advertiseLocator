@@ -34,8 +34,6 @@ const (
 	UpdateTarget string = "Update"
 	DeleteTarget string = "Delete"
 	QueryTarget  string = "Query"
-	AuthTarget   string = "Authentication"
-	ApiKeyTarget string = "APIKey"
 	AccessTarget string = "Access"
 )
 
@@ -68,12 +66,29 @@ type ErrorDetail struct {
 	Message string `json:"message"`
 }
 
+func httpTarget(httpCode int, requestMethod string) string {
+	switch true {
+	case httpCode == http.StatusUnauthorized:
+		return AccessTarget
+	case requestMethod == http.MethodPost:
+		return InsertTarget
+	case requestMethod == http.MethodGet:
+		return QueryTarget
+	case requestMethod == http.MethodPut:
+		return UpdateTarget
+	case requestMethod == http.MethodDelete:
+		return DeleteTarget
+	default:
+		return ""
+	}
+}
+
 //ErrorResponse helper
-func ResponseError(request echo.Context, httpCode int, httpTarget, internalCode, detailTarget, detailMessage string) error {
+func ResponseError(request echo.Context, httpCode int, internalCode, detailTarget, detailMessage string) error {
 	errorMessage := new(ErrorModel)
 	errorMessage.Code = httpCode
 	errorMessage.Message = http.StatusText(httpCode)
-	errorMessage.Target = httpTarget
+	errorMessage.Target = httpTarget(httpCode, request.Request().Method)
 	body := new(ErrorDetail)
 	body.Code = internalCode
 	body.Target = detailTarget

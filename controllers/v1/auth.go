@@ -25,10 +25,6 @@ func authRepository() repositories.AuthInterface {
 //PersonRegister controller to register person
 func PersonRegister(request echo.Context) (err error) {
 	//added from apikey middleware to context
-	xAPIKeyData := request.Get(models.APIKeyHeaderKey)
-	if !helpers.IsInstance(xAPIKeyData, (*models.API)(nil)) {
-		return helpers.ResponseError(request, http.StatusForbidden, helpers.ApiKeyTarget, "C1000", "Verify API Key", "API key must be instance of API model")
-	}
 	registerRequest := new(requests.PersonRegister)
 	if err = request.Bind(registerRequest); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -63,7 +59,7 @@ func PersonRegister(request echo.Context) (err error) {
 	}
 	auth.Password = hashedPassword
 	auth.Type = models.EmailAuthType
-	client, err := clientMapper(request, auth, registerRequest.Client, xAPIKeyData.(*models.API))
+	client, err := clientMapper(request, auth, registerRequest.Client, helpers.APIKeyData(request))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -77,10 +73,6 @@ func PersonRegister(request echo.Context) (err error) {
 //PersonLogin controller
 func PersonLogin(request echo.Context) (err error) {
 	//added from apikey middleware to context
-	xAPIKeyData := request.Get(models.APIKeyHeaderKey)
-	if !helpers.IsInstance(xAPIKeyData, (*models.API)(nil)) {
-		return helpers.ResponseError(request, http.StatusForbidden, helpers.ApiKeyTarget, "C1000", "Verify API Key", "API key must be instance of API model")
-	}
 	loginRequest := new(requests.PersonLogin)
 	if err = request.Bind(loginRequest); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -95,7 +87,7 @@ func PersonLogin(request echo.Context) (err error) {
 	if !helpers.CheckPasswordHash(loginRequest.Password, auth.Password) {
 		return echo.NewHTTPError(http.StatusNonAuthoritativeInfo, "auth value or password is wrong")
 	}
-	client, err := clientMapper(request, auth, loginRequest.Client, xAPIKeyData.(*models.API))
+	client, err := clientMapper(request, auth, loginRequest.Client, helpers.APIKeyData(request))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

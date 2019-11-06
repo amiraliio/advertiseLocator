@@ -21,7 +21,7 @@ func CheckAPIKey(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(request echo.Context) error {
 		xAPIKey := request.Request().Header.Get(models.APIKeyHeaderKey)
 		if xAPIKey == "" {
-			return helpers.ResponseError(request, http.StatusUnauthorized, helpers.AccessTarget, "M1000", helpers.ApiKeyTarget, lang.MustSetValidAPIKey)
+			return helpers.ResponseError(request, http.StatusUnauthorized, "M1000",helpers.AccessTarget, lang.MustSetValidAPIKey)
 		}
 		dataKey, err := helpers.DecodeToken(xAPIKey)
 		if err != nil {
@@ -57,7 +57,7 @@ func userAccess(next echo.HandlerFunc, userType string) echo.HandlerFunc {
 	return func(request echo.Context) error {
 		auth := request.Request().Header.Get(models.AuthorizationHeaderKey)
 		if auth == "" {
-			return helpers.ResponseError(request, http.StatusUnauthorized, helpers.AccessTarget, "M1001", helpers.AuthTarget, "Must be authenticated")
+			return helpers.ResponseError(request, http.StatusUnauthorized, "M1001", helpers.AccessTarget, "Must be authenticated")
 		}
 		data, err := helpers.DecodeToken(auth)
 		if err != nil {
