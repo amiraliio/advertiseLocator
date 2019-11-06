@@ -18,11 +18,11 @@ require (
 	github.com/valyala/fasttemplate v1.1.0 // indirect
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
 	github.com/xdg/stringprep v1.0.0 // indirect
-	go.mongodb.org/mongo-driver v1.1.2
-	golang.org/x/crypto v0.0.0-20191029031824-8986dd9e96cf
-	golang.org/x/net v0.0.0-20191028085509-fe3aa8a45271 // indirect
+	go.mongodb.org/mongo-driver v1.1.3
+	golang.org/x/crypto v0.0.0-20191105034135-c7e5f84aec59
+	golang.org/x/net v0.0.0-20191105084925-a882066a44e0 // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
-	golang.org/x/sys v0.0.0-20191029155521-f43be2a4598c // indirect
+	golang.org/x/sys v0.0.0-20191105231009-c1f44814a5cd // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v9 v9.30.0
 )

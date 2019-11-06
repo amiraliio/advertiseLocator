@@ -29,7 +29,6 @@ func authData(request echo.Context) (*models.Client, error) {
 	return auth.(*models.Client), nil
 }
 
-
 //AddAdvertise controller
 func AddAdvertise(request echo.Context) (err error) {
 	authData, err := authData(request)
