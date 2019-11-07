@@ -76,11 +76,11 @@ func ResponseError(request echo.Context, httpCode int, internalCode, detailTarge
 	body.Code = internalCode
 	if httpCode == http.StatusUnprocessableEntity && len(detailMessage) > 0 {
 		target := strings.Fields(detailMessage)
-		body.Target = target[0]
+		body.Target = strings.ToLower(target[0])
 	} else {
 		body.Target = detailTarget
 	}
-	body.Message = detailMessage
+	body.Message = strings.ToLower(detailMessage)
 	errorMessage.Details = append(errorMessage.Details, body)
 	response := new(ResponseModel)
 	response.Success = false

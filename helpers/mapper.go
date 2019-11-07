@@ -25,6 +25,7 @@ func IsInstance(src, dst interface{}) bool {
 	return reflect.TypeOf(src) == reflect.TypeOf(dst)
 }
 
+//TODO check validation
 func BindAndValidateRequest(request echo.Context, requestModel interface{}) (interface{}, error) {
 	if err := request.Bind(requestModel); err != nil {
 		return nil, err
