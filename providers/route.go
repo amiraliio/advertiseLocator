@@ -13,7 +13,7 @@ import (
 func initRoutes() {
 	routes.API()
 	printRoutesToConsole()
-	configs.Server.Logger.Fatal(configs.Server.Start(":" + os.Getenv("SERVER_PORT")))
+	configs.Server.Logger.Fatal(configs.Server.Start(":" + os.Getenv("APP_PORT")))
 }
 
 //print whole project routes in the startup console
