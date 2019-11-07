@@ -28,6 +28,9 @@ func IsInstance(src, dst interface{}) bool {
 //TODO check validation
 func BindAndValidateRequest(request echo.Context, requestModel interface{}) (interface{}, error) {
 	if err := request.Bind(requestModel); err != nil {
+		if err := request.Validate(requestModel); err != nil {
+			return nil, err
+		}
 		return nil, err
 	}
 	if err := request.Validate(requestModel); err != nil {

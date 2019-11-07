@@ -79,3 +79,4 @@ func gzip(framework *echo.Echo) *echo.Echo {
 	}
 	return framework
 }
+
