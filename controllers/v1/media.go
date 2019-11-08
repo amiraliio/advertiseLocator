@@ -43,25 +43,31 @@ func UploadMedia(request echo.Context) (err error) {
 	if err != nil {
 		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1005", "Open File", "cannot open the file")
 	}
-	sourceFile.Close()
+	defer sourceFile.Close()
 	authData := helpers.AuthData(request)
 	storagePath := helpers.Path("storage")
-	filePath := "/temp/images/" + authData.UserID.Hex() + "/" + uuid.New().String() + "/" + file.Filename
-	destination, err := os.Create(storagePath + filePath)
-	if err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1006", "Create Directory", "cannot create directory")
+	filePath := "/temp/images/" + authData.UserID.Hex() + "/" + uuid.New().String()
+	fileName := "/" + file.Filename
+	if _, err := os.Stat(storagePath + filePath); os.IsNotExist(err) {
+		if err = os.MkdirAll(storagePath+filePath, 0755); err != nil {
+			return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1006", "Create Directory", "cannot create directory")
+		}
 	}
-	destination.Close()
+	destination, err := os.Create(storagePath + filePath + fileName)
+	if err != nil {
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1007", "Write File", "cannot write in the directory")
+	}
+	defer destination.Close()
 	if _, err := io.Copy(destination, sourceFile); err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1007", "Move File", "cannot move file to the directory")
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1008", "Move File", "cannot move file to the directory")
 	}
 	imageModel := new(models.Image)
-	imageModel.OriginalURL = filePath
-	imageModel.URL = filePath
+	imageModel.OriginalURL = filePath + fileName
+	imageModel.URL = filePath + fileName
 	imageModel.Size = models.OriginalSize
 	image, err := helpers.Flatten(imageModel)
 	if err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1008", "Map Image", "image url cannot map to image model")
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1009", "Map Image", "image url cannot map to image model")
 	}
 	return helpers.ResponseOk(request, http.StatusOK, image)
 }
