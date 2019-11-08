@@ -12,6 +12,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+//TODO add image url to originalURL
+//TODO there must be one main image
+
 //Notice: this controller detail error code start with CA which is abbreviation for Controller Advertise
 //so each go file has their own unique code prefix, which implemented by responsibility + entity name
 

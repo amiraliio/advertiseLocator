@@ -25,8 +25,6 @@ func framework() (framework *echo.Echo) {
 	framework.Validator = &validation{validator: instantiateValidator()}
 	//active logger
 	framework = logger(framework)
-	//Recover middleware recovers from panics anywhere in the chain, prints stack trace and handles the control to the centralized HTTPErrorHandler.
-	framework = trace(framework)
 	// Debug mode
 	framework = debugger(framework)
 	//active gzip if in production
@@ -41,7 +39,7 @@ func framework() (framework *echo.Echo) {
 }
 
 func logger(framework *echo.Echo) *echo.Echo {
-	logger, err := strconv.ParseBool(os.Getenv("ACTIVE_LOGGER"))
+	logger, err := strconv.ParseBool(os.Getenv("APP_LOGGER"))
 	if err != nil {
 		framework.Logger.Fatal(err.Error())
 	}
@@ -51,23 +49,15 @@ func logger(framework *echo.Echo) *echo.Echo {
 	return framework
 }
 
-func trace(framework *echo.Echo) *echo.Echo {
-	trace, err := strconv.ParseBool(os.Getenv("ACTIVE_RECOVER"))
-	if err != nil {
-		framework.Logger.Fatal(err.Error())
-	}
-	if trace {
-		framework.Use(middleware.Recover())
-	}
-	return framework
-}
-
 func debugger(framework *echo.Echo) *echo.Echo {
-	debug, err := strconv.ParseBool(os.Getenv("SERVER_DEBUG"))
+	debug, err := strconv.ParseBool(os.Getenv("APP_DEBUG"))
 	if err != nil {
 		framework.Logger.Fatal(err.Error())
 	}
 	framework.Debug = debug
+	if debug {
+		framework.Use(middleware.Recover())
+	}
 	return framework
 }
 
@@ -79,4 +69,3 @@ func gzip(framework *echo.Echo) *echo.Echo {
 	}
 	return framework
 }
-

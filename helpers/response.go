@@ -50,7 +50,7 @@ type ErrorDetail struct {
 }
 
 func httpTarget(httpCode int, requestMethod string) string {
-	switch true {
+	switch {
 	case httpCode == http.StatusUnauthorized:
 		return AccessTarget
 	case requestMethod == http.MethodPost:
