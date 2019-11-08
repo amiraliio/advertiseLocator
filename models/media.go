@@ -7,16 +7,29 @@ const (
 	ThumbnailSize string = "THUMBNAIL"
 )
 
-//media file types
+//Image types
 const (
-	TypePDF  string = "pdf"
 	TypeJPG  string = "jpg"
 	TypeJPEG string = "jpeg"
 	TypeGIF  string = "gif"
 	TypePNG  string = "png"
+)
+
+//file types
+const (
+	TypePDF string = "pdf"
+)
+
+//video types
+const (
 	TypeMP4  string = "mp4"
 	Type3GP  string = "3gp"
 	TypeMPEG string = "mpeg"
+)
+
+//audio types
+const (
+	TypeMP3 string = "mp3"
 )
 
 //BaseMedia model
@@ -50,3 +63,10 @@ type AdvertiseImage struct {
 	Show     bool   `json:"show" bson:"show" validate:"required"`
 	Priority byte   `json:"priority" bson:"priority" validate:"required,numeric,max=3"`
 }
+
+// func ValidateMediaType(filename, mediaType string) bool{
+// 	switch mediaType {
+// 	case "image":
+// 		if
+// 	}
+// }

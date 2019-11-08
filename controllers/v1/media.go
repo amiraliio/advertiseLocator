@@ -65,11 +65,7 @@ func UploadMedia(request echo.Context) (err error) {
 	imageModel.OriginalURL = filePath + fileName
 	imageModel.URL = filePath + fileName
 	imageModel.Size = models.OriginalSize
-	image, err := helpers.Flatten(imageModel)
-	if err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1009", "Map Image", "image url cannot map to image model")
-	}
-	return helpers.ResponseOk(request, http.StatusOK, image)
+	return helpers.ResponseOk(request, http.StatusOK, imageModel)
 }
 
 func GetMedia(request echo.Context) (err error) {
