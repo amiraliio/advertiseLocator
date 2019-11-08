@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"github.com/amiraliio/advertiselocator/configs"
 	"net/http"
 	"strconv"
 	"strings"
@@ -36,10 +37,17 @@ type PaginationModel struct {
 
 //ErrorMessage model
 type ErrorModel struct {
-	Code    int            `json:"code"`
-	Message string         `json:"message"`
-	Target  string         `json:"target"`
-	Details []*ErrorDetail `json:"details"`
+	Code       int            `json:"code"`
+	Message    string         `json:"message"`
+	Target     string         `json:"target"`
+	Details    []*ErrorDetail `json:"details"`
+	InnerError *InnerError    `json:"innererror"`
+}
+
+//InnerError model
+type InnerError struct {
+	Trace   string `json:"trace"`
+	Context string `json:"context"`
 }
 
 //ErrorDetail model
@@ -67,7 +75,7 @@ func httpTarget(httpCode int, requestMethod string) string {
 }
 
 //ErrorResponse helper
-func ResponseError(request echo.Context, httpCode int, internalCode, detailTarget, detailMessage string) error {
+func ResponseError(request echo.Context, err error, httpCode int, internalCode, detailTarget, detailMessage string) error {
 	errorMessage := new(ErrorModel)
 	errorMessage.Code = httpCode
 	errorMessage.Message = http.StatusText(httpCode)
@@ -82,6 +90,11 @@ func ResponseError(request echo.Context, httpCode int, internalCode, detailTarge
 	}
 	body.Message = strings.ToLower(detailMessage)
 	errorMessage.Details = append(errorMessage.Details, body)
+	if configs.Server.Debug {
+		innerError := new(InnerError)
+		innerError.Trace = err.Error()
+		errorMessage.InnerError = innerError
+	}
 	response := new(ResponseModel)
 	response.Success = false
 	response.Error = errorMessage

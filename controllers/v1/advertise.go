@@ -26,7 +26,7 @@ func advertiseRepository() repositories.AdvertiseInterface {
 func AddAdvertise(request echo.Context) error {
 	advertiseRequest, err := helpers.BindAndValidateRequest(request, new(requests.Advertise))
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusUnprocessableEntity, "CA-1000", "Validatation", err.Error())
+		return helpers.ResponseError(request, err, http.StatusUnprocessableEntity, "CA-1000", "Validatation", err.Error())
 	}
 	requestModel := advertiseRequest.(*requests.Advertise)
 	advertise := new(models.Advertise)
@@ -46,7 +46,7 @@ func AddAdvertise(request echo.Context) error {
 	advertise.Visibility = requestModel.Visibility
 	result, err := advertiseRepository().InsertAdvertise(advertise)
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusNotModified, "CA-1001", "Insert Advertise", err.Error())
+		return helpers.ResponseError(request, err, http.StatusNotModified, "CA-1001", "Insert Advertise", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusCreated, result)
 }
@@ -57,7 +57,7 @@ func ListOfAdvertises(request echo.Context) (err error) {
 	filter.UserID = helpers.AuthData(request).UserID
 	results, err := advertiseRepository().ListOfAdvertise(filter)
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, "CA-1002", "List Of Advertise", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1002", "List Of Advertise", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusOK, results)
 }
@@ -68,12 +68,12 @@ func GetAdvertise(request echo.Context) (err error) {
 	filter.UserID = helpers.AuthData(request).UserID
 	objectId, err := primitive.ObjectIDFromHex(request.Param("id"))
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, "CA-1003", "Create ObjectID", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1003", "Create ObjectID", err.Error())
 	}
 	filter.ID = objectId
 	results, err := advertiseRepository().FindOne(filter)
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, "CA-1004", "Get Advertise", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1004", "Get Advertise", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusOK, results)
 }
@@ -83,12 +83,12 @@ func DeleteAdvertise(request echo.Context) (err error) {
 	filter.UserID = helpers.AuthData(request).UserID
 	objectId, err := primitive.ObjectIDFromHex(request.Param("id"))
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, "CA-1005", "Create ObjectID", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1005", "Create ObjectID", err.Error())
 	}
 	filter.ID = objectId
 	_, err = advertiseRepository().DeleteOne(filter)
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, "CA-1006", "Delete Advertise", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1006", "Delete Advertise", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusOK, "Deleted")
 }
