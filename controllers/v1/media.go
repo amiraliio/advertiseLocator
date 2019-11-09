@@ -4,7 +4,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -15,7 +14,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-//TODO check file types
 //TODO resize and exif check
 
 func UploadMedia(request echo.Context) (err error) {
@@ -24,7 +22,7 @@ func UploadMedia(request echo.Context) (err error) {
 	mediaTypes := []string{models.ImageMediaType, models.VideosMediaType, models.FilesMediaType, models.AudiosMediaType}
 	isCurrentMediaType, _ := helpers.StringSortAndSearch(mediaTypes, requestedMediaType)
 	if !isCurrentMediaType {
-		return helpers.ResponseError(request, nil, http.StatusUnprocessableEntity, "CM-1000", "Media Type", "requested media type must be one the [ image, video, file, audio]")
+		return helpers.ResponseError(request, nil, http.StatusUnprocessableEntity, "CM-1000", "Media Type", "requested media type must be one the "+strings.Join(mediaTypes, ", "))
 	}
 	file, err := request.FormFile("media")
 	if err != nil {
@@ -52,7 +50,7 @@ func UploadMedia(request echo.Context) (err error) {
 	}
 	success, mimeTypes := helpers.ValidateFileType(mimeType, requestedMediaType)
 	if !success {
-		return helpers.ResponseError(request, nil, http.StatusBadRequest, "CM-1007", "Check Mime Type", "media must be one of the "+reflect.ValueOf(mimeTypes).String())
+		return helpers.ResponseError(request, nil, http.StatusBadRequest, "CM-1007", "Check Mime Type", requestedMediaType+" must be one of the "+strings.Join(mimeTypes, ", "))
 	}
 	authData := helpers.AuthData(request)
 	storagePath := helpers.Path("storage")
@@ -77,6 +75,7 @@ func UploadMedia(request echo.Context) (err error) {
 	imageModel.OriginalURL = filePath + fileName
 	imageModel.URL = filePath + fileName
 	imageModel.Size = models.OriginalSize
+	imageModel.Type = mimeType
 	return helpers.ResponseOk(request, http.StatusOK, imageModel)
 }
 
