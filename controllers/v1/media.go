@@ -4,9 +4,10 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"sort"
+	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/amiraliio/advertiselocator/helpers"
 	"github.com/amiraliio/advertiselocator/models"
@@ -14,14 +15,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-//TODO file types
+//TODO check file types
+//TODO resize and exif check
 
 func UploadMedia(request echo.Context) (err error) {
 	requestedMediaType := request.Param("mediaType")
-	mediaTypes := []string{"image", "video", "file", "audio"}
-	sort.Strings(mediaTypes)
-	indexOfMediaType := sort.SearchStrings(mediaTypes, requestedMediaType)
-	if indexOfMediaType >= len(mediaTypes) || mediaTypes[indexOfMediaType] != requestedMediaType {
+	//TODO add media to const
+	mediaTypes := []string{models.ImageMediaType, models.VideosMediaType, models.FilesMediaType, models.AudiosMediaType}
+	isCurrentMediaType, _ := helpers.StringSortAndSearch(mediaTypes, requestedMediaType)
+	if !isCurrentMediaType {
 		return helpers.ResponseError(request, nil, http.StatusUnprocessableEntity, "CM-1000", "Media Type", "requested media type must be one the [ image, video, file, audio]")
 	}
 	file, err := request.FormFile("media")
@@ -44,22 +46,32 @@ func UploadMedia(request echo.Context) (err error) {
 		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1005", "Open File", "cannot open the file")
 	}
 	defer sourceFile.Close()
+	mimeType, err := helpers.FileExtension(sourceFile)
+	if err != nil {
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1006", "Read File Extension", "cannot read file extension")
+	}
+	success, mimeTypes := helpers.ValidateFileType(mimeType, requestedMediaType)
+	if !success {
+		return helpers.ResponseError(request, nil, http.StatusBadRequest, "CM-1007", "Check Mime Type", "media must be one of the "+reflect.ValueOf(mimeTypes).String())
+	}
 	authData := helpers.AuthData(request)
 	storagePath := helpers.Path("storage")
-	filePath := "/temp/images/" + authData.UserID.Hex() + "/" + uuid.New().String()
+	//TODO move this string to helper
+	filePath := "/temp/" + requestedMediaType + "/" + authData.UserID.Hex() + "/" + strconv.Itoa(time.Now().Year()) + "/" + strconv.Itoa(int(time.Now().Month())) + "/" + strconv.Itoa(time.Now().Day()) + "/" + uuid.New().String()
 	fileName := "/" + file.Filename
+	//TODO move this mkdir to helpers
 	if _, err := os.Stat(storagePath + filePath); os.IsNotExist(err) {
 		if err = os.MkdirAll(storagePath+filePath, 0755); err != nil {
-			return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1006", "Create Directory", "cannot create directory")
+			return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1008", "Create Directory", "cannot create directory")
 		}
 	}
 	destination, err := os.Create(storagePath + filePath + fileName)
 	if err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1007", "Write File", "cannot write in the directory")
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1009", "Write File", "cannot write in the directory")
 	}
 	defer destination.Close()
 	if _, err := io.Copy(destination, sourceFile); err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1008", "Move File", "cannot move file to the directory")
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1010", "Move File", "cannot move file to the directory")
 	}
 	imageModel := new(models.Image)
 	imageModel.OriginalURL = filePath + fileName

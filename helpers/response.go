@@ -90,7 +90,7 @@ func ResponseError(request echo.Context, err error, httpCode int, internalCode, 
 	}
 	body.Message = strings.ToLower(detailMessage)
 	errorMessage.Details = append(errorMessage.Details, body)
-	if configs.Server.Debug {
+	if configs.Server.Debug && err != nil {
 		innerError := new(InnerError)
 		innerError.Trace = err.Error()
 		errorMessage.InnerError = innerError
