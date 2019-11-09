@@ -18,7 +18,6 @@ import (
 
 func UploadMedia(request echo.Context) (err error) {
 	requestedMediaType := request.Param("mediaType")
-	//TODO add media to const
 	mediaTypes := []string{models.ImageMediaType, models.VideosMediaType, models.FilesMediaType, models.AudiosMediaType}
 	isCurrentMediaType, _ := helpers.StringSortAndSearch(mediaTypes, requestedMediaType)
 	if !isCurrentMediaType {

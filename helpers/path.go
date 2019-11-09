@@ -12,6 +12,10 @@ func Path(dirName string) string {
 		return path.Join(path.Dir(root), "..")
 	case "storage":
 		return path.Join(path.Dir(root), "../storage")
+	case "temp":
+		return path.Join(path.Dir(root), "../storage/temp")
+	case "media":
+		return path.Join(path.Dir(root), "../storage/media")
 	default:
 		return path.Join(path.Dir(root), "..")
 	}
