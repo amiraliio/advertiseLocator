@@ -50,7 +50,7 @@ func logger(framework *echo.Echo) *echo.Echo {
 }
 
 func debugger(framework *echo.Echo) *echo.Echo {
-	debug, err := strconv.ParseBool(os.Getenv("APP_DEBUGGER"))
+	debug, err := strconv.ParseBool(os.Getenv("APP_DEBUG"))
 	if err != nil {
 		framework.Logger.Fatal(err.Error())
 	}

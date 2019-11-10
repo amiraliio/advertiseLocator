@@ -28,7 +28,7 @@ func authRepository() repositories.AuthInterface {
 func PersonRegister(request echo.Context) (err error) {
 	registerRequest, err := helpers.BindAndValidateRequest(request, new(requests.PersonRegister))
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusUnprocessableEntity, "CU-1000", "Validate", err.Error())
+		return helpers.ResponseError(request, err, http.StatusUnprocessableEntity, "CU-1000", "Validate", err.Error())
 	}
 	requestModel := registerRequest.(*requests.PersonRegister)
 	//person model
@@ -54,17 +54,17 @@ func PersonRegister(request echo.Context) (err error) {
 	auth.UserID = personID
 	hashedPassword, err := helpers.HashPassword(requestModel.Password)
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, "CU-1001", "Encrypt Password", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CU-1001", "Encrypt Password", err.Error())
 	}
 	auth.Password = hashedPassword
 	auth.Type = models.EmailAuthType
 	client, err := clientMapper(request, auth, requestModel.Client, helpers.APIKeyData(request))
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, "CU-1002", "Map Client", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CU-1002", "Map Client", err.Error())
 	}
 	result, err := authRepository().PersonRegister(person, auth, client)
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, "CU-1003", "Register Person", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CU-1003", "Register Person", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusCreated, result)
 }
@@ -73,23 +73,23 @@ func PersonRegister(request echo.Context) (err error) {
 func PersonLogin(request echo.Context) (err error) {
 	loginRequest, err := helpers.BindAndValidateRequest(request, new(requests.PersonLogin))
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusUnprocessableEntity, "CU-1004", "Validate", err.Error())
+		return helpers.ResponseError(request, err, http.StatusUnprocessableEntity, "CU-1004", "Validate", err.Error())
 	}
 	requestModel := loginRequest.(*requests.PersonLogin)
 	auth, err := authRepository().GetAuthData(requestModel.Email)
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusNonAuthoritativeInfo, "CU-1005", "Fetch Auth Data", err.Error())
+		return helpers.ResponseError(request, err, http.StatusNonAuthoritativeInfo, "CU-1005", "Fetch Auth Data", err.Error())
 	}
 	if !helpers.CheckPasswordHash(requestModel.Password, auth.Password) {
-		return helpers.ResponseError(request, http.StatusNonAuthoritativeInfo, "CU-1006", "Fetch Auth Data", "auth value or password is wrong")
+		return helpers.ResponseError(request, nil, http.StatusNonAuthoritativeInfo, "CU-1006", "Fetch Auth Data", "auth value or password is wrong")
 	}
 	client, err := clientMapper(request, auth, requestModel.Client, helpers.APIKeyData(request))
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, "CU-1007", "Map client", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CU-1007", "Map client", err.Error())
 	}
 	_, err = authRepository().InsertClient(client)
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, "CU-1008", "Insert client", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CU-1008", "Insert client", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusOK, client)
 }

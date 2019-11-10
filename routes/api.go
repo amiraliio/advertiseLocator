@@ -11,6 +11,7 @@ var (
 	apiV1     *echo.Group = configs.Server.Group("/api/v1")
 	auth      *echo.Group = apiV1.Group("/auth", middleware.CheckAPIKey)
 	advertise *echo.Group = apiV1.Group("/advertises", middleware.CheckAPIKey)
+	media     *echo.Group = apiV1.Group("/media", middleware.CheckAPIKey)
 )
 
 //API routes
@@ -28,5 +29,9 @@ func API() {
 	advertise.GET("/:id", controllers.GetAdvertise, middleware.CheckIsPerson).Name = "api-v1-get-advertise"
 	advertise.DELETE("/:id", controllers.DeleteAdvertise, middleware.CheckIsPerson).Name = "api-v1-delete-advertise"
 	// advertise.PUT("/:id", controllers.UpdateAdvertise, middleware.CheckIsPerson).Name = "api-v1-update-advertise"
+
+	//media crud
+	media.POST("/:mediaType/upload", controllers.UploadMedia, middleware.CheckIsPerson)
+	media.GET("/:mediaType/upload", controllers.GetMedia, middleware.CheckIsPerson)
 
 }

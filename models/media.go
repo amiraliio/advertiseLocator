@@ -7,16 +7,20 @@ const (
 	ThumbnailSize string = "THUMBNAIL"
 )
 
-//media file types
+//media groups
 const (
-	TypePDF  string = "pdf"
-	TypeJPG  string = "jpg"
-	TypeJPEG string = "jpeg"
-	TypeGIF  string = "gif"
-	TypePNG  string = "png"
-	TypeMP4  string = "mp4"
-	Type3GP  string = "3gp"
-	TypeMPEG string = "mpeg"
+	ImageMediaType  string = "images"
+	VideosMediaType string = "videos"
+	AudiosMediaType string = "audios"
+	FilesMediaType  string = "files"
+)
+
+//media mimetypes
+var (
+	ImageMimeTypes []string = []string{"image/jpg", "image/jpeg", "image/pjpeg", "image/gif", "image/png"}
+	VideMimeTypes  []string = []string{"video/mp4", "video/avi", "video/webm"}
+	AudioMimeTypes []string = []string{"audio/mpeg", "audio/wave"}
+	FileMimeTypes  []string = []string{"application/pdf"}
 )
 
 //BaseMedia model

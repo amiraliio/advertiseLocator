@@ -36,13 +36,13 @@ func getSystemRepo() repositories.SystemInterface {
 func GenerateAPIKey(request echo.Context) (err error) {
 	requestAPIKey, err := helpers.BindAndValidateRequest(request, new(requests.APIKey))
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusUnprocessableEntity, "CS-1000", "Validatation", err.Error())
+		return helpers.ResponseError(request, err, http.StatusUnprocessableEntity, "CS-1000", "Validatation", err.Error())
 	}
 	requestModel := requestAPIKey.(*requests.APIKey)
 	uuidAsString := uuid.New().String()
 	token, err := helpers.EncodeToken(uuidAsString, requestModel.Type, os.Getenv("API_KEY_TOKEN_EXPIRE_DAY"))
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, "CS-1001", "Encryption", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CS-1001", "Encryption", err.Error())
 	}
 	api := new(models.API)
 	api.Key = uuidAsString
@@ -57,7 +57,7 @@ func GenerateAPIKey(request echo.Context) (err error) {
 	api.CreatedBy = primitive.NilObjectID
 	data, err := getSystemRepo().CreateAPIKey(api)
 	if err != nil {
-		return helpers.ResponseError(request, http.StatusBadRequest, "CS-1002", "Insert API Key", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CS-1002", "Insert API Key", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusCreated, data)
 }

@@ -4,6 +4,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+//TODO models validation
+
 //AdvertiseCollection collection name
 const AdvertiseCollection string = "advertises"
 
