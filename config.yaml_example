@@ -5,6 +5,7 @@ APP:
     PORT: 3479
     DEBUG: true
     LOGGER: true
+    SHOW_ROUTES: false
 
 AUTH:
     CLIENT_TOKEN_EXPIRE_DAY: 60 #day

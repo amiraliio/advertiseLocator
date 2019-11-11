@@ -12,7 +12,9 @@ import (
 //Init routes in the package main
 func initRoutes() {
 	routes.API()
-	printRoutesToConsole()
+	if viper.GetBool("APP.SHOW_ROUTES") {
+		printRoutesToConsole()
+	}
 	configs.Server.Logger.Fatal(configs.Server.Start(":" + viper.GetString("APP.PORT")))
 }
 
