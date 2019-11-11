@@ -13,6 +13,7 @@ func Start() {
 
 //do what you want in startup in this method
 func register() {
+	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	if err := viper.ReadInConfig(); err != nil {
