@@ -1,22 +1,42 @@
-FROM golang as builder
+# Start from the latest golang base image
+FROM golang:latest as builder
 
-ENV GO111MODULE=on
-
+# Set the Current Working Directory inside the container
 WORKDIR /app
 
-COPY go.mod /app
-COPY go.sum /app
+# Copy go mod and sum files
+COPY go.mod go.sum ./
 
+# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
 RUN go mod download
 
-COPY . /app
+# Copy the source from the current directory to the Working Directory inside the container
+COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o vajari
+# Build the Go app
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o vajari
 
-FROM scratch
+######## Start a new stage from scratch #######
+FROM alpine:latest
 
-COPY --from=builder /app/vajari /app/
+RUN apk --no-cache add ca-certificates
 
+WORKDIR /root/
+
+# Copy the Pre-built binary file from the previous stage
+COPY --from=builder /app/vajari .
+
+# Expose port 8080 to the outside world
 EXPOSE 3479
 
-ENTRYPOINT ["./app/vajari"]
+# Command to run the executable
+CMD ["./vajari"]
+
+
+
+#Type the following command to build the above image
+#docker build -t vajari .
+
+
+#Type the following command to run the docker image
+#docker run -d -p 3479:3479 vajari
