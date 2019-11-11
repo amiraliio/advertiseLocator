@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/spf13/viper"
 	"io"
 	"net/http"
 	"os"
@@ -27,10 +28,7 @@ func UploadMedia(request echo.Context) (err error) {
 	if err != nil {
 		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1001", "Upload File", "file not uploaded")
 	}
-	mediaSize, err := strconv.ParseInt(os.Getenv(strings.ToUpper(requestedMediaType)+"_SIZE"), 0, 10)
-	if err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1002", "Get File Size", "cannot estimate file size")
-	}
+	mediaSize := viper.GetInt64("MEDIA." + strings.ToUpper(requestedMediaType) + "_SIZE")
 	fileSizeInMegaByte, err := helpers.ConvertByte(file.Size, "MB")
 	if err != nil {
 		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1003", "Get File Size", "cannot estimate file size")

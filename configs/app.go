@@ -1,12 +1,12 @@
 package configs
 
 import (
-	"os"
-	"strconv"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/spf13/viper"
 )
+
+//TODO add all environment variable to unique context
 
 const (
 	DevelopEnvironment    string = "DEV"
@@ -39,10 +39,7 @@ func framework() (framework *echo.Echo) {
 }
 
 func logger(framework *echo.Echo) *echo.Echo {
-	logger, err := strconv.ParseBool(os.Getenv("APP_LOGGER"))
-	if err != nil {
-		framework.Logger.Fatal(err.Error())
-	}
+	logger := viper.GetBool("APP.LOGGER")
 	if logger {
 		framework.Use(middleware.Logger())
 	}
@@ -50,10 +47,7 @@ func logger(framework *echo.Echo) *echo.Echo {
 }
 
 func debugger(framework *echo.Echo) *echo.Echo {
-	debug, err := strconv.ParseBool(os.Getenv("APP_DEBUG"))
-	if err != nil {
-		framework.Logger.Fatal(err.Error())
-	}
+	debug := viper.GetBool("APP.DEBUG")
 	framework.Debug = debug
 	if debug {
 		framework.Use(middleware.Recover())
@@ -62,7 +56,7 @@ func debugger(framework *echo.Echo) *echo.Echo {
 }
 
 func gzip(framework *echo.Echo) *echo.Echo {
-	if os.Getenv("APP_ENV") == ProductionEnvironment {
+	if viper.GetString("APP.ENV") == ProductionEnvironment {
 		framework.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 			Level: 5,
 		}))

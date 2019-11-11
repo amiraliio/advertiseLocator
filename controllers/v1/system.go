@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/amiraliio/advertiselocator/helpers"
 	"github.com/amiraliio/advertiselocator/models"
@@ -10,6 +9,7 @@ import (
 	"github.com/amiraliio/advertiselocator/requests"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -40,7 +40,7 @@ func GenerateAPIKey(request echo.Context) (err error) {
 	}
 	requestModel := requestAPIKey.(*requests.APIKey)
 	uuidAsString := uuid.New().String()
-	token, err := helpers.EncodeToken(uuidAsString, requestModel.Type, os.Getenv("API_KEY_TOKEN_EXPIRE_DAY"))
+	token, err := helpers.EncodeToken(uuidAsString, requestModel.Type, viper.GetInt("AUTH.API_KEY_TOKEN_EXPIRE_DAY"))
 	if err != nil {
 		return helpers.ResponseError(request, err, http.StatusBadRequest, "CS-1001", "Encryption", err.Error())
 	}

@@ -2,19 +2,19 @@ package configs
 
 import (
 	"context"
-	"os"
 	"time"
 
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func config() *mongo.Client {
 	var config string
-	if os.Getenv("MONGO_USERNAME") != "" && os.Getenv("MONGO_PASSWORD") != "" {
-		config = "mongodb://" + os.Getenv("MONGO_USERNAME") + ":" + os.Getenv("MONGO_PASSWORD") + "@" + os.Getenv("MONGO_HOST") + ":" + os.Getenv("MONGO_PORT")
+	if viper.GetString("DATABASES.MONGO.USERNAME") != "" && viper.GetString("DATABASES.MONGO.PASSWORD") != "" {
+		config = "mongodb://" + viper.GetString("DATABASES.MONGO.USERNAME") + ":" + viper.GetString("DATABASES.MONGO.PASSWORD") + "@" + viper.GetString("DATABASES.MONGO.HOST") + ":" + viper.GetString("DATABASES.MONGO.PORT")
 	} else {
-		config = "mongodb://" + os.Getenv("MONGO_HOST") + ":" + os.Getenv("MONGO_PORT")
+		config = "mongodb://" + viper.GetString("DATABASES.MONGO.HOST") + ":" + viper.GetString("DATABASES.MONGO.PORT")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -27,5 +27,5 @@ func config() *mongo.Client {
 
 //DB config
 func DB() *mongo.Database {
-	return config().Database(os.Getenv("MONGO_DATABASE"))
+	return config().Database(viper.GetString("DATABASES.MONGO.DATABASE"))
 }

@@ -3,7 +3,6 @@ package controllers
 import (
 	"math/rand"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/amiraliio/advertiselocator/helpers"
@@ -12,6 +11,7 @@ import (
 	"github.com/amiraliio/advertiselocator/requests"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -111,12 +111,12 @@ func clientMapper(request echo.Context, auth *models.Auth, clientRequest *reques
 	client.OSVersion = clientRequest.OsVersion
 	client.LastLogin = primitive.NewDateTimeFromTime(time.Now())
 	client.API = xAPIKeyData
-	refreshToken, err := helpers.EncodeToken(uuid.New().String(), models.PersonUserType, os.Getenv("CLIENT_TOKEN_EXPIRE_DAY"))
+	refreshToken, err := helpers.EncodeToken(uuid.New().String(), models.PersonUserType, viper.GetInt("AUTH.CLIENT_TOKEN_EXPIRE_DAY"))
 	if err != nil {
 		return nil, err
 	}
 	client.RefreshToken = refreshToken.Token
-	clientToken, err := helpers.EncodeToken(auth.UserID.Hex(), models.PersonUserType, os.Getenv("CLIENT_TOKEN_EXPIRE_DAY"))
+	clientToken, err := helpers.EncodeToken(auth.UserID.Hex(), models.PersonUserType, viper.GetInt("AUTH.CLIENT_TOKEN_EXPIRE_DAY"))
 	if err != nil {
 		return nil, err
 	}

@@ -7,11 +7,11 @@ import (
 	"encoding/base64"
 	"errors"
 	"io"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -29,10 +29,10 @@ type Cipher struct {
 }
 
 //EncodeToken encode
-func EncodeToken(id, tokenType, expire string) (*Cipher, error) {
+func EncodeToken(id, tokenType string, expireTime int) (*Cipher, error) {
 	createdAt := time.Now()
 	token := []byte(id + tokenSplitter + tokenType + tokenSplitter + strconv.FormatInt(createdAt.Unix(), 10))
-	block, err := aes.NewCipher([]byte(os.Getenv("APP_KEY")))
+	block, err := aes.NewCipher([]byte(viper.GetString("APP.KEY")))
 	if err != nil {
 		return nil, err
 	}
@@ -49,10 +49,6 @@ func EncodeToken(id, tokenType, expire string) (*Cipher, error) {
 	encryptedToken := new(Cipher)
 	encryptedToken.Token = tokenInBase64
 	encryptedToken.CreatedAt = primitive.NewDateTimeFromTime(createdAt)
-	expireTime, err := strconv.Atoi(expire)
-	if err != nil {
-		return nil, err
-	}
 	encryptedToken.ExpireDate = primitive.NewDateTimeFromTime(createdAt.AddDate(0, 0, expireTime))
 	return encryptedToken, nil
 }
@@ -66,7 +62,7 @@ func DecodeToken(token string) (*Cipher, error) {
 	if len(tokenInByte) < aes.BlockSize {
 		return nil, errors.New("token length is too short")
 	}
-	block, err := aes.NewCipher([]byte(os.Getenv("APP_KEY")))
+	block, err := aes.NewCipher([]byte(viper.GetString("APP.KEY")))
 	if err != nil {
 		return nil, err
 	}

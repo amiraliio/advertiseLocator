@@ -1,5 +1,5 @@
+config.yaml
 .vscode
 .idea
-.env
 gin-bin
 __debug_bin

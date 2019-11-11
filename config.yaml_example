@@ -1,0 +1,26 @@
+APP:
+    ENV: DEV
+    URL: http://localhost:3400
+    KEY:
+    PORT: 3479
+    DEBUG: true
+    LOGGER: true
+
+AUTH:
+    CLIENT_TOKEN_EXPIRE_DAY: 60 #day
+    API_KEY_TOKEN_EXPIRE_DAY: 365 #day
+
+MEDIA:
+    BASE_URL: http://localhost:3400/media
+    IMAGES_SIZE: 10 #MB
+    VIDEOS_SIZE: 100 #MB
+    FILES_SIZE: 50 #MB
+    AUDIOS_SIZE: 30 #MB
+
+DATABASES:
+    MONGO:
+        HOST: 127.0.0.1
+        PORT: 27017
+        USERNAME:
+        PASSWORD:
+        DATABASE: advertiseLocator

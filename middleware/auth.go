@@ -2,14 +2,13 @@ package middleware
 
 import (
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/amiraliio/advertiselocator/helpers"
 	lang "github.com/amiraliio/advertiselocator/lang/eng"
 	"github.com/amiraliio/advertiselocator/models"
 	"github.com/labstack/echo/v4"
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -27,11 +26,7 @@ func CheckAPIKey(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return helpers.ResponseError(request, err, http.StatusUnauthorized, "MA-1001", "Decode API Key", lang.MustSetValidAPIKey)
 		}
-		expireTime, err := strconv.Atoi(os.Getenv("API_KEY_TOKEN_EXPIRE_DAY"))
-		if err != nil {
-			return helpers.ResponseError(request, err, http.StatusBadRequest, "MA-1002", "API Key Expire Time", err.Error())
-		}
-		if dataKey.CreatedAt < primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, -expireTime)) {
+		if dataKey.CreatedAt < primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, -viper.GetInt("AUTH.API_KEY_TOKEN_EXPIRE_DAY"))) {
 			return helpers.ResponseError(request, nil, http.StatusUnauthorized, "MA-1003", helpers.AccessTarget, lang.TheAPIKeyExpired)
 		}
 		apiModel := new(models.API)
@@ -66,11 +61,7 @@ func userAccess(next echo.HandlerFunc, userType string) echo.HandlerFunc {
 		if data.Type != userType {
 			return helpers.ResponseError(request, nil, http.StatusUnauthorized, "MA-1006", helpers.AccessTarget, "Access denied")
 		}
-		expireDate, err := strconv.Atoi(os.Getenv("CLIENT_TOKEN_EXPIRE_DAY"))
-		if err != nil {
-			return helpers.ResponseError(request, err, http.StatusBadRequest, "MA-1007", "Client Expire Time", err.Error())
-		}
-		if data.CreatedAt < primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, -expireDate)) {
+		if data.CreatedAt < primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, -viper.GetInt("AUTH.CLIENT_TOKEN_EXPIRE_DAY"))) {
 			return helpers.ResponseError(request, nil, http.StatusUnauthorized, "MA-1008", helpers.AccessTarget, "Token expired")
 		}
 		client := new(models.Client)

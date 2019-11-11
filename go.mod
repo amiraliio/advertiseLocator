@@ -6,17 +6,16 @@ require (
 	code.cloudfoundry.org/bytefmt v0.0.0-20190819182555-854d396b647c
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.16.0
-	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/google/uuid v1.1.1
-	github.com/joho/godotenv v1.3.0
 	github.com/labstack/echo/v4 v4.1.11
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mattn/go-isatty v0.0.10 // indirect
 	github.com/onsi/ginkgo v1.10.3 // indirect
 	github.com/onsi/gomega v1.7.1 // indirect
+	github.com/spf13/viper v1.5.0
 	github.com/tidwall/pretty v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.1.0 // indirect
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect

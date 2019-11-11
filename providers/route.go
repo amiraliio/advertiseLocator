@@ -3,17 +3,17 @@ package providers
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 
 	"github.com/amiraliio/advertiselocator/configs"
 	"github.com/amiraliio/advertiselocator/routes"
+	"github.com/spf13/viper"
 )
 
 //Init routes in the package main
 func initRoutes() {
 	routes.API()
 	printRoutesToConsole()
-	configs.Server.Logger.Fatal(configs.Server.Start(":" + os.Getenv("APP_PORT")))
+	configs.Server.Logger.Fatal(configs.Server.Start(":" + viper.GetString("APP.PORT")))
 }
 
 //print whole project routes in the startup console
