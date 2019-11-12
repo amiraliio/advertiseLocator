@@ -68,6 +68,7 @@ func UploadMedia(request echo.Context) (err error) {
 	if _, err := io.Copy(destination, sourceFile); err != nil {
 		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1010", "Move File", "cannot move file to the directory")
 	}
+	_ = destination.Sync()
 	imageModel := new(models.Image)
 	imageModel.OriginalURL = filePath + fileName
 	imageModel.URL = filePath + fileName
