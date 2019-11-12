@@ -61,7 +61,7 @@ func customMessages(validate *validator.Validate) *validator.Validate {
 	}
 	for i, v := range messages {
 		if j == len(messages) {
-			break
+			goto END
 		}
 		_ = validate.RegisterTranslation(i, translator, func(ut ut.Translator) error {
 			return ut.Add(i, "{0} "+v, true)
@@ -72,5 +72,6 @@ func customMessages(validate *validator.Validate) *validator.Validate {
 		j++
 		return customMessages(validate)
 	}
+END:
 	return validate
 }
