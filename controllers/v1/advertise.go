@@ -66,11 +66,11 @@ func ListOfAdvertises(request echo.Context) (err error) {
 func GetAdvertise(request echo.Context) (err error) {
 	filter := new(models.AdvertiseFilter)
 	filter.UserID = helpers.AuthData(request).UserID
-	objectId, err := primitive.ObjectIDFromHex(request.Param("id"))
+	objectID, err := primitive.ObjectIDFromHex(request.Param("id"))
 	if err != nil {
 		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1003", "Create ObjectID", err.Error())
 	}
-	filter.ID = objectId
+	filter.ID = objectID
 	results, err := advertiseRepository().FindOne(filter)
 	if err != nil {
 		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1004", "Get Advertise", err.Error())
@@ -81,11 +81,11 @@ func GetAdvertise(request echo.Context) (err error) {
 func DeleteAdvertise(request echo.Context) (err error) {
 	filter := new(models.AdvertiseFilter)
 	filter.UserID = helpers.AuthData(request).UserID
-	objectId, err := primitive.ObjectIDFromHex(request.Param("id"))
+	objectID, err := primitive.ObjectIDFromHex(request.Param("id"))
 	if err != nil {
 		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1005", "Create ObjectID", err.Error())
 	}
-	filter.ID = objectId
+	filter.ID = objectID
 	_, err = advertiseRepository().DeleteOne(filter)
 	if err != nil {
 		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1006", "Delete Advertise", err.Error())

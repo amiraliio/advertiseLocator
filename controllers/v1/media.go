@@ -1,7 +1,7 @@
+//Package controllers ...
 package controllers
 
 import (
-	"github.com/spf13/viper"
 	"io"
 	"net/http"
 	"os"
@@ -13,6 +13,7 @@ import (
 	"github.com/amiraliio/advertiselocator/models"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/spf13/viper"
 )
 
 //TODO resize and exif check
@@ -41,11 +42,7 @@ func UploadMedia(request echo.Context) (err error) {
 		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1005", "Open File", "cannot open the file")
 	}
 	defer sourceFile.Close()
-	mimeType, err := helpers.FileExtension(sourceFile)
-	if err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CM-1006", "Read File Extension", "cannot read file extension")
-	}
-	success, mimeTypes := helpers.ValidateFileType(mimeType, requestedMediaType)
+	success, mimeTypes := helpers.ValidateFileType(file.Header.Get("content-type"), requestedMediaType)
 	if !success {
 		return helpers.ResponseError(request, nil, http.StatusBadRequest, "CM-1007", "Check Mime Type", requestedMediaType+" must be one of the "+strings.Join(mimeTypes, ", "))
 	}
@@ -73,7 +70,7 @@ func UploadMedia(request echo.Context) (err error) {
 	imageModel.OriginalURL = filePath + fileName
 	imageModel.URL = filePath + fileName
 	imageModel.Size = models.OriginalSize
-	imageModel.Type = mimeType
+	imageModel.Type = file.Header.Get("content-type")
 	return helpers.ResponseOk(request, http.StatusOK, imageModel)
 }
 

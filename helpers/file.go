@@ -1,19 +1,9 @@
+//Package helpers ...
 package helpers
 
 import (
-	"mime/multipart"
-	"net/http"
-
 	"github.com/amiraliio/advertiselocator/models"
 )
-
-func FileExtension(sourceFile multipart.File) (string, error) {
-	fileBuffer := make([]byte, 512)
-	if _, err := sourceFile.Read(fileBuffer); err != nil {
-		return "", err
-	}
-	return http.DetectContentType(fileBuffer), nil
-}
 
 func ValidateFileType(fileType, mediaType string) (bool, []string) {
 	switch mediaType {
