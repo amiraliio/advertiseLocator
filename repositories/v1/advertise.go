@@ -28,6 +28,7 @@ func (service *AdvertiseRepository) InsertAdvertise(advertise *models.Advertise)
 }
 
 func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilter) ([]*models.Advertise, error) {
+	//TODO move this query builder and use fluent structure
 	query := bson.D{
 		bson.E{
 			Key:   "person._id",
