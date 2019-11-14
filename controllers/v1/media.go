@@ -75,5 +75,12 @@ func UploadMedia(request echo.Context) (err error) {
 }
 
 func GetMedia(request echo.Context) (err error) {
-	return nil
+	tempPath := helpers.Path("temp")
+	mediaType := request.Param("mediaType")
+	userID := request.Param("userID")
+	date := request.Param("year") + "/" + request.Param("month") + "/" + request.Param("day")
+	uniqueID := request.Param("uniqueID")
+	filename := request.Param("filename")
+	filePath := tempPath + "/" + mediaType + "/" + userID + "/" + date + "/" + uniqueID + "/" + filename
+	return request.Inline(filePath, filename)
 }

@@ -9,10 +9,11 @@ import (
 )
 
 var (
-	apiV1     *echo.Group = configs.Server.Group("/api/v1")
-	auth      *echo.Group = apiV1.Group("/auth", middleware.CheckAPIKey)
-	advertise *echo.Group = apiV1.Group("/advertises", middleware.CheckAPIKey)
-	media     *echo.Group = apiV1.Group("/media", middleware.CheckAPIKey)
+	apiV1       *echo.Group = configs.Server.Group("/api/v1")
+	auth        *echo.Group = apiV1.Group("/auth", middleware.CheckAPIKey)
+	advertise   *echo.Group = apiV1.Group("/advertises", middleware.CheckAPIKey)
+	media       *echo.Group = apiV1.Group("/media", middleware.CheckAPIKey)
+	publicMedia *echo.Group = configs.Server.Group("/media", middleware.CheckAPIKey)
 )
 
 //API routes
@@ -33,6 +34,6 @@ func API() {
 
 	//media crud
 	media.POST("/:mediaType/upload", controllers.UploadMedia, middleware.CheckIsPerson)
-	media.GET("/:mediaType/upload", controllers.GetMedia, middleware.CheckIsPerson)
+	publicMedia.GET("/temp/:mediaType/:userID/:year/:month/:day/:uniqueID/:filename", controllers.GetMedia)
 
 }
