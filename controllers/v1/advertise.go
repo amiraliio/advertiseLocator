@@ -29,6 +29,9 @@ func AddAdvertise(request echo.Context) error {
 		return helpers.ResponseError(request, err, http.StatusUnprocessableEntity, "CA-1000", "Validatation", err.Error())
 	}
 	requestModel := advertiseRequest.(*requests.Advertise)
+	if requestModel.Visibility != models.PrivateVisibility && requestModel.Visibility != models.PublicVisibility {
+		return helpers.ResponseError(request, nil, http.StatusUnprocessableEntity, "CA-1001", "Validate Visibility Type", "type of visibility is invalid and must be one of the "+models.PrivateVisibility+", "+models.PublicVisibility)
+	}
 	advertise := new(models.Advertise)
 	advertise.Status = models.ActiveStatus
 	advertise.ID = primitive.NewObjectID()
@@ -46,7 +49,7 @@ func AddAdvertise(request echo.Context) error {
 	advertise.Visibility = requestModel.Visibility
 	result, err := advertiseRepository().InsertAdvertise(advertise)
 	if err != nil {
-		return helpers.ResponseError(request, err, http.StatusNotModified, "CA-1001", "Insert Advertise", err.Error())
+		return helpers.ResponseError(request, err, http.StatusNotModified, "CA-1002", "Insert Advertise", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusCreated, result)
 }

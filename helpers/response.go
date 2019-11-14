@@ -82,13 +82,14 @@ func ResponseError(request echo.Context, err error, httpCode int, internalCode, 
 	errorMessage.Target = httpTarget(httpCode, request.Request().Method)
 	body := new(ErrorDetail)
 	body.Code = internalCode
+	//TODO improve detail message target
 	if httpCode == http.StatusUnprocessableEntity && len(detailMessage) > 0 {
 		target := strings.Fields(detailMessage)
 		body.Target = strings.ToLower(target[0])
 	} else {
 		body.Target = detailTarget
 	}
-	body.Message = strings.ToLower(detailMessage)
+	body.Message = detailMessage
 	errorMessage.Details = append(errorMessage.Details, body)
 	if configs.Server.Debug && err != nil {
 		innerError := new(InnerError)

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/amiraliio/advertiselocator/helpers"
 	"github.com/amiraliio/advertiselocator/models"
@@ -39,10 +40,15 @@ func GenerateAPIKey(request echo.Context) (err error) {
 		return helpers.ResponseError(request, err, http.StatusUnprocessableEntity, "CS-1000", "Validatation", err.Error())
 	}
 	requestModel := requestAPIKey.(*requests.APIKey)
+	types := []string{models.AndroidAPIKey, models.ExternalAPIKey, models.IosAPIKey, models.WebAPIKey}
+	success, _ := helpers.StringSortAndSearch(types, requestModel.Type)
+	if !success {
+		return helpers.ResponseError(request, nil, http.StatusUnprocessableEntity, "CS-1001", "Generate API KEY", "type of API key is invalid and must be one of the "+strings.Join(types, ", "))
+	}
 	uuidAsString := uuid.New().String()
 	token, err := helpers.EncodeToken(uuidAsString, requestModel.Type, viper.GetInt("AUTH.API_KEY_TOKEN_EXPIRE_DAY"))
 	if err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CS-1001", "Encryption", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CS-1002", "Encryption", err.Error())
 	}
 	api := new(models.API)
 	api.Key = uuidAsString
@@ -57,7 +63,7 @@ func GenerateAPIKey(request echo.Context) (err error) {
 	api.CreatedBy = primitive.NilObjectID
 	data, err := getSystemRepo().CreateAPIKey(api)
 	if err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CS-1002", "Insert API Key", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CS-1003", "Insert API Key", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusCreated, data)
 }
