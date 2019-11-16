@@ -53,7 +53,7 @@ func userAccess(next echo.HandlerFunc, userType string) echo.HandlerFunc {
 	return func(request echo.Context) error {
 		auth := request.Request().Header.Get(models.AuthorizationHeaderKey)
 		if auth == "" {
-			return helpers.ResponseError(request, nil, http.StatusUnauthorized, "MA-1004", helpers.AccessTarget, "Must be authenticated")
+			return next(request)
 		}
 		data, err := helpers.DecodeToken(auth)
 		if err != nil {
@@ -73,6 +73,12 @@ func userAccess(next echo.HandlerFunc, userType string) echo.HandlerFunc {
 		}
 		client.UserID = objectID
 		request.Set(models.AuthorizationHeaderKey, client)
+		return next(request)
+	}
+}
+
+func PublicAccess(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(request echo.Context) error{
 		return next(request)
 	}
 }

@@ -1,13 +1,16 @@
+//Package repositories ...
 package repositories
 
 import (
 	"context"
+	"fmt"
 	"errors"
 	"time"
 
 	"github.com/amiraliio/advertiselocator/helpers"
 	"github.com/amiraliio/advertiselocator/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type AdvertiseInterface interface {
@@ -29,12 +32,20 @@ func (service *AdvertiseRepository) InsertAdvertise(advertise *models.Advertise)
 
 func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilter) ([]*models.Advertise, error) {
 	//TODO move this query builder and use fluent structure
-	query := bson.D{
-		bson.E{
-			Key:   "person._id",
-			Value: filter.UserID,
-		},
+	var query bson.D
+	if filter.UserID == primitive.NilObjectID {
+		query = bson.D{
+
+		}
+	} else {
+		query = bson.D{
+			bson.E{
+				Key:   "person._id",
+				Value: filter.UserID,
+			},
+		}
 	}
+
 	cursor, err := helpers.Mongo().List(models.AdvertiseCollection, query)
 	if err != nil {
 		return nil, err

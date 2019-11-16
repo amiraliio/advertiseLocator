@@ -1,7 +1,11 @@
 package controllers
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/amiraliio/advertiselocator/helpers"
@@ -56,11 +60,65 @@ func AddAdvertise(request echo.Context) error {
 
 //ListOfAdvertises controller
 func ListOfAdvertises(request echo.Context) (err error) {
+	//filter mapper
 	filter := new(models.AdvertiseFilter)
-	filter.UserID = helpers.AuthData(request).UserID
+	if request.Get(models.AuthorizationHeaderKey) != nil {
+		filter.UserID = helpers.AuthData(request).UserID
+	}
+	if request.QueryParam("startDate") != "" {
+		startDate, err := helpers.ParsDateTime(request.QueryParam("startDate"))
+		if err != nil {
+			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1003", "Parse StartDate", err.Error())
+		}
+		filter.StartDate = primitive.NewDateTimeFromTime(startDate)
+	}
+	if request.QueryParam("endDate") != "" {
+		endDate, err := helpers.ParsDateTime(request.QueryParam("endDate"))
+		if err != nil {
+			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1004", "Parse EndDate", err.Error())
+		}
+		filter.EndDate = primitive.NewDateTimeFromTime(endDate)
+	}
+	if request.QueryParam("page") == "" {
+		filter.Page = 1
+	} else {
+		page, err := strconv.Atoi(request.QueryParam("page"))
+		if err != nil {
+			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1005", "Str Page To Int", err.Error())
+		}
+		filter.Page = page
+	}
+	if request.QueryParam("limit") == "" {
+		filter.Limit = 20
+	} else {
+		limit, err := strconv.Atoi(request.QueryParam("limit"))
+		if err != nil {
+			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1006", "Str Limit To Int", err.Error())
+		}
+		filter.Limit = limit
+	}
+	filter.Sort = request.QueryParam("sort")
+	queryParam := request.QueryParam("query")
+	//TODO implement below mapper as functional
+	if queryParam != "" {
+		query := &queryParam
+		if strings.HasSuffix(*query, "==") {
+			*query = strings.TrimSuffix(*query, "==")
+		}
+		if strings.HasSuffix(*query, "=") {
+			*query = strings.TrimSuffix(*query, "=")
+		}
+		tagsAsString, err := base64.RawStdEncoding.DecodeString(*query)
+		if err != nil {
+			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1007", "Decode Base64", err.Error())
+		}
+		if err = json.Unmarshal(tagsAsString, filter); err != nil {
+			return helpers.ResponseError(request, nil, http.StatusBadRequest, "CA-1008", "Map Tags", "query data must be tags[] model")
+		}
+	}
 	results, err := advertiseRepository().ListOfAdvertise(filter)
 	if err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1002", "List Of Advertise", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1009", "List Of Advertise", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusOK, results)
 }
@@ -71,12 +129,12 @@ func GetAdvertise(request echo.Context) (err error) {
 	filter.UserID = helpers.AuthData(request).UserID
 	objectID, err := primitive.ObjectIDFromHex(request.Param("id"))
 	if err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1003", "Create ObjectID", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1010", "Create ObjectID", err.Error())
 	}
 	filter.ID = objectID
 	results, err := advertiseRepository().FindOne(filter)
 	if err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1004", "Get Advertise", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-10011", "Get Advertise", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusOK, results)
 }
@@ -86,12 +144,12 @@ func DeleteAdvertise(request echo.Context) (err error) {
 	filter.UserID = helpers.AuthData(request).UserID
 	objectID, err := primitive.ObjectIDFromHex(request.Param("id"))
 	if err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1005", "Create ObjectID", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1012", "Create ObjectID", err.Error())
 	}
 	filter.ID = objectID
 	_, err = advertiseRepository().DeleteOne(filter)
 	if err != nil {
-		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1006", "Delete Advertise", err.Error())
+		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1013", "Delete Advertise", err.Error())
 	}
 	return helpers.ResponseOk(request, http.StatusOK, "Deleted")
 }

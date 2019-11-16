@@ -83,7 +83,7 @@ func DecodeToken(token string) (*Cipher, error) {
 		decryptedToken.CreatedAt = primitive.NewDateTimeFromTime(time.Unix(timestamp, 0))
 		return decryptedToken, nil
 	}
-	return nil, errors.New("data of token is not right")
+	return nil, errors.New("token data must be valid")
 }
 
 //HashPassword helper

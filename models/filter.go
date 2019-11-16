@@ -6,12 +6,13 @@ import (
 
 //BaseFilter filter
 type BaseFilter struct {
-	CreatedAt primitive.DateTime `json:"createdAt" query:"createdAt" bson:"createdAt"`
+	StartDate primitive.DateTime `json:"startDate" query:"startdate" bson:"startdate"`
+	EndDate   primitive.DateTime `json:"endDate" query:"endDate" bson:"endDate"`
 	UserID    primitive.ObjectID `json:"userID" bson:"userID"`
 	ID        primitive.ObjectID `json:"id" bson:"_id"`
 	Sort      string             `json:"sort" query:"sort" bson:"sort"`
-	Page      uint16             `json:"page" query:"page"`
-	Limit     uint16             `json:"limit" query:"limit"`
+	Page      int                `json:"page" query:"page"`
+	Limit     int                `json:"limit" query:"limit"`
 }
 
 //TagFilter filter
@@ -26,5 +27,5 @@ type TagFilter struct {
 //AdvertiseFilter
 type AdvertiseFilter struct {
 	BaseFilter ",inline"
-	Tags       []*Tag
+	Tags       []*Tag `json:"tags" query:"tags" bson:"tags"`
 }

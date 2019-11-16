@@ -21,6 +21,7 @@ type AuthInterface interface {
 //AuthRepository repository
 type AuthRepository struct{}
 
+//TODO this function must be ACID
 //PersonRegister method
 func (service *AuthRepository) PersonRegister(person *models.Person, auth *models.Auth, client *models.Client) (*models.Client, error) {
 	userExist, err := checkUserExistOrNot(auth)
