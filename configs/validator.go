@@ -1,3 +1,4 @@
+//Package configs ...
 package configs
 
 import (
@@ -53,8 +54,6 @@ func customMessages(validate *validator.Validate) *validator.Validate {
 		"email":     "must be a valid email",
 		"unique":    "must be array of unique values",
 		"numeric":   "must be numeric",
-		"min":       "must follow minimum length",
-		"max":       "must follow maximum length",
 		"uuid":      "must be a valid uuid",
 		"latitude":  "must be a valid latitude",
 		"longitude": "must be a valid longitude",

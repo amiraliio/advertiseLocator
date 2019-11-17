@@ -3,7 +3,6 @@ package repositories
 
 import (
 	"context"
-	"fmt"
 	"errors"
 	"time"
 
@@ -30,41 +29,62 @@ func (service *AdvertiseRepository) InsertAdvertise(advertise *models.Advertise)
 	return advertise, nil
 }
 
-func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilter) ([]*models.Advertise, error) {
+func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilter) (advertises []*models.Advertise, err error) {
 	//TODO move this query builder and use fluent structure
-	var query bson.D
-	if filter.UserID == primitive.NilObjectID {
-		query = bson.D{
-
+	//build query
+	var queryBuilder bson.D
+	for _, tag := range filter.Tags {
+		var tagFilter bson.E
+		if tag.Min != "" {
+			tagFilter = bson.E{
+				Key: "$match",
+				Value: bson.E{
+					Key:   tag.Key,
+					Value: tag.Value,
+				},
+			}
 		}
-	} else {
-		query = bson.D{
-			bson.E{
+		queryBuilder = append(queryBuilder, tagFilter)
+	}
+	//if request from auth user another query block will be added to final query builder
+	if filter.UserID != primitive.NilObjectID {
+		userQuery := bson.E{
+			Key: "$match",
+			Value: bson.E{
 				Key:   "person._id",
 				Value: filter.UserID,
 			},
 		}
+		queryBuilder = append(queryBuilder, userQuery)
 	}
-
-	cursor, err := helpers.Mongo().List(models.AdvertiseCollection, query)
+	skip := bson.E{
+		Key:   "$skip",
+		Value: filter.Page * filter.Limit,
+	}
+	limit := bson.E{
+		Key:   "$limit",
+		Value: filter.Limit,
+	}
+	queryBuilder = append(queryBuilder, skip, limit)
+	//perform query
+	cursor, err := helpers.Mongo().Find(models.AdvertiseCollection, queryBuilder)
 	if err != nil {
 		return nil, err
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	defer cursor.Close(ctx)
-	var data []*models.Advertise
 	for cursor.Next(ctx) {
 		var advertise *models.Advertise
-		if err := cursor.Decode(&advertise); err != nil {
+		if err = cursor.Decode(&advertise); err != nil {
 			return nil, err
 		}
-		data = append(data, advertise)
+		advertises = append(advertises, advertise)
 	}
 	if cursor.Err() != nil {
 		return nil, cursor.Err()
 	}
-	return data, nil
+	return advertises, nil
 }
 
 func (service *AdvertiseRepository) FindOne(filter *models.AdvertiseFilter) (advertise *models.Advertise, err error) {

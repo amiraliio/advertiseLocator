@@ -24,7 +24,8 @@ func Mongo() MongoInterface {
 type MongoInterface interface {
 	InsertOne(collectionName string, object interface{}) (primitive.ObjectID, error)
 	FindOne(collectionName string, query bson.M) *mongo.SingleResult
-	List(collectionName string, query bson.D) (*mongo.Cursor, error)
+	Find(collectionName string, query bson.D) (*mongo.Cursor, error)
+	Aggregate(collectionName string, query bson.D) (*mongo.Cursor, error)
 	FindOneAndUpdate(collectionName string, filter bson.D, update bson.D) *mongo.SingleResult
 	DeleteOne(collectionName string, filter bson.M) (deleteResult *mongo.DeleteResult, err error)
 }
@@ -34,17 +35,28 @@ type mongoService struct{}
 //FindOne helper
 func (service *mongoService) FindOne(collectionName string, query bson.M) *mongo.SingleResult {
 	db := configs.DB().Collection(collectionName)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 7*time.Second)
 	defer cancel()
 	return db.FindOne(ctx, query)
 }
 
-//List helper
-func (service *mongoService) List(collectionName string, query bson.D) (*mongo.Cursor, error) {
+//Find helper
+func (service *mongoService) Find(collectionName string, query bson.D) (*mongo.Cursor, error) {
 	db := configs.DB().Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	cursor, err := db.Find(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	return cursor, nil
+}
+
+func (service *mongoService) Aggregate(colllectionName string, query bson.D) (cursor *mongo.Cursor, err error) {
+	db := configs.DB().Collection(colllectionName)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	cursor, err = db.Aggregate(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +82,7 @@ func (service *mongoService) InsertOne(collectionName string, object interface{}
 //FindOneAndUpdate helper
 func (service *mongoService) FindOneAndUpdate(collectionName string, filter bson.D, update bson.D) *mongo.SingleResult {
 	collection := configs.DB().Collection(collectionName)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 7*time.Second)
 	defer cancel()
 	return collection.FindOneAndUpdate(ctx, filter, update)
 }

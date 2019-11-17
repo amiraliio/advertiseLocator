@@ -18,6 +18,7 @@ import (
 
 //TODO add image url to originalURL
 //TODO there must be one main image
+//TODO update images type and size
 
 //Notice: this controller detail error code start with CA which is abbreviation for Controller Advertise
 //so each go file has their own unique code prefix, which implemented by responsibility + entity name
