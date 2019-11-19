@@ -30,44 +30,83 @@ func (service *AdvertiseRepository) InsertAdvertise(advertise *models.Advertise)
 }
 
 func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilter) (advertises []*models.Advertise, err error) {
-	//TODO move this query builder and use fluent structure
+	//TODO move this query builder and use fluent api pattern
 	//build query
-	var queryBuilder bson.D
+	//TODO change this to raw query because is more clear
+	var query bson.D
 	for _, tag := range filter.Tags {
-		var tagFilter bson.E
+		if (tag.Min != "" && tag.Max != "" && tag.Min == tag.Max) || (tag.Value != "") {
+			exactQueryTagKey := bson.E{
+				Key:   "tags.key",
+				Value: tag.Key,
+			}
+			var exactQueryTagValue bson.E
+			if tag.Value == "" {
+				exactQueryTagValue = bson.E{
+					Key:   "tags.value",
+					Value: tag.Min,
+				}
+			} else {
+				exactQueryTagValue = bson.E{
+					Key:   "tags.value",
+					Value: tag.Value,
+				}
+			}
+			// jjj := bson.D{exactQueryTagKey, exactQueryTagValue}
+			query = append(query, exactQueryTagKey, exactQueryTagValue)
+			continue
+		}
 		if tag.Min != "" {
-			tagFilter = bson.E{
-				Key: "$match",
+			minQueryTagKey := bson.E{
+				Key:   "tags.key",
+				Value: tag.Key,
+			}
+			minQueryTagValue := bson.E{
+				Key: "tags.value",
 				Value: bson.E{
-					Key:   tag.Key,
+					Key:   "$gte",
 					Value: tag.Value,
 				},
 			}
+			query = append(query, minQueryTagKey, minQueryTagValue)
+			continue
 		}
-		queryBuilder = append(queryBuilder, tagFilter)
+		if tag.Max != "" {
+			maxQueryTagKey := bson.E{
+				Key:   "tags.key",
+				Value: tag.Key,
+			}
+			maxQueryTagValue := bson.E{
+				Key: "tags.value",
+				Value: bson.E{
+					Key:   "$lte",
+					Value: tag.Value,
+				},
+			}
+			query = append(query, maxQueryTagKey, maxQueryTagValue)
+			continue
+		}
 	}
 	//if request from auth user another query block will be added to final query builder
 	if filter.UserID != primitive.NilObjectID {
 		userQuery := bson.E{
-			Key: "$match",
-			Value: bson.E{
-				Key:   "person._id",
-				Value: filter.UserID,
-			},
+			Key:   "person._id",
+			Value: filter.UserID,
 		}
-		queryBuilder = append(queryBuilder, userQuery)
+		query = append(query, userQuery)
 	}
-	skip := bson.E{
-		Key:   "$skip",
-		Value: filter.Page * filter.Limit,
-	}
-	limit := bson.E{
-		Key:   "$limit",
-		Value: filter.Limit,
-	}
-	queryBuilder = append(queryBuilder, skip, limit)
+	// skip := bson.E{
+	// 	Key:   "$skip",
+	// 	Value: filter.Page * filter.Limit,
+	// }
+	// limit := bson.E{
+	// 	Key:   "$limit",
+	// 	Value: filter.Limit,
+	// }
+	// queryBuilder = append(queryBuilder, skip, limit)
+
 	//perform query
-	cursor, err := helpers.Mongo().Find(models.AdvertiseCollection, queryBuilder)
+	cursor, err := helpers.Mongo().Find(models.AdvertiseCollection, query)
 	if err != nil {
 		return nil, err
 	}
