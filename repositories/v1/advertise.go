@@ -33,67 +33,55 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 	//TODO move this query builder and use fluent api pattern
 	//build query
 	//TODO change this to raw query because is more clear
-	var query bson.D
+
+	var mapper bson.A
 	for _, tag := range filter.Tags {
 		if (tag.Min != "" && tag.Max != "" && tag.Min == tag.Max) || (tag.Value != "") {
-			exactQueryTagKey := bson.E{
-				Key:   "tags.key",
-				Value: tag.Key,
-			}
-			var exactQueryTagValue bson.E
 			if tag.Value == "" {
-				exactQueryTagValue = bson.E{
-					Key:   "tags.value",
-					Value: tag.Min,
-				}
+				exactValue := bson.M{"tags.key": tag.Key, "tags.value": tag.Min}
+				// exactValue := bson.D{tagObjectExactKey, tagObjectExactValue}
+				mapper = append(mapper, exactValue)
+				continue
 			} else {
-				exactQueryTagValue = bson.E{
-					Key:   "tags.value",
-					Value: tag.Value,
-				}
+				exactValue := bson.M{"tags.key": tag.Key, "tags.value": tag.Value}
+				// exactValue := bson.D{tagObjectExactKey, tagObjectExactValue}
+				mapper = append(mapper, exactValue)
+				continue
 			}
-			// jjj := bson.D{exactQueryTagKey, exactQueryTagValue}
-			query = append(query, exactQueryTagKey, exactQueryTagValue)
-			continue
 		}
-		if tag.Min != "" {
-			minQueryTagKey := bson.E{
-				Key:   "tags.key",
-				Value: tag.Key,
-			}
-			minQueryTagValue := bson.E{
-				Key: "tags.value",
-				Value: bson.E{
-					Key:   "$gte",
-					Value: tag.Value,
-				},
-			}
-			query = append(query, minQueryTagKey, minQueryTagValue)
-			continue
+		if tag.Min != "" && tag.Value == "" {
+			minValue := bson.M{"tags.key": tag.Key, "tags.value": bson.E{Key: "$gte", Value: tag.Min}}
+			// tagObjectMinValue := bson.E{
+			// 	Key: "tags.value",
+			// 	Value: bson.E{
+			// 		Key:   "$gte",
+			// 		Value: tag.Min,
+			// 	},
+			// }
+			// minValue := bson.D{tagObjectMinKey, tagObjectMinValue}
+			mapper = append(mapper, minValue)
 		}
-		if tag.Max != "" {
-			maxQueryTagKey := bson.E{
-				Key:   "tags.key",
-				Value: tag.Key,
-			}
-			maxQueryTagValue := bson.E{
-				Key: "tags.value",
-				Value: bson.E{
-					Key:   "$lte",
-					Value: tag.Value,
-				},
-			}
-			query = append(query, maxQueryTagKey, maxQueryTagValue)
-			continue
+		if tag.Max != "" && tag.Value == "" {
+			// tagObjectMaxKey := bson.E{
+			// 	Key:   "tags.key",
+			// 	Value: tag.Key,
+			// }
+			// tagObjectMaxValue := bson.E{
+			// 	Key: "tags.value",
+			// 	Value: bson.E{
+			// 		Key:   "$lte",
+			// 		Value: tag.Max,
+			// 	},
+			// }
+			maxValue := bson.M{"tags.key": tag.Key, "tags.value": bson.E{Key: "$lte", Value: tag.Max}}
+			// maxValue := bson.D{tagObjectMaxKey, tagObjectMaxValue}
+			mapper = append(mapper, maxValue)
 		}
 	}
 	//if request from auth user another query block will be added to final query builder
 	if filter.UserID != primitive.NilObjectID {
-		userQuery := bson.E{
-			Key:   "person._id",
-			Value: filter.UserID,
-		}
-		query = append(query, userQuery)
+		userValue := bson.M{"person._id": filter.UserID}
+		mapper = append(mapper, userValue)
 	}
 	// skip := bson.E{
 	// 	Key:   "$skip",
@@ -104,9 +92,10 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 	// 	Value: filter.Limit,
 	// }
 	// queryBuilder = append(queryBuilder, skip, limit)
-
 	//perform query
-	cursor, err := helpers.Mongo().Find(models.AdvertiseCollection, query)
+
+	builder := bson.D{bson.E{Key: "$and", Value: mapper}}
+	cursor, err := helpers.Mongo().Find(models.AdvertiseCollection, builder)
 	if err != nil {
 		return nil, err
 	}
