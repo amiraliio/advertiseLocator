@@ -38,49 +38,66 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 	for _, tag := range filter.Tags {
 		if (tag.Min != "" && tag.Max != "" && tag.Min == tag.Max) || (tag.Value != "") {
 			if tag.Value == "" {
-				exactValue := bson.M{"tags.key": tag.Key, "tags.value": tag.Min}
-				// exactValue := bson.D{tagObjectExactKey, tagObjectExactValue}
+				exactValue := bson.D{
+					bson.E{Key: "tags.key", Value: tag.Key},
+					bson.E{Key: "tags.value", Value: tag.Min},
+				}
 				mapper = append(mapper, exactValue)
 				continue
 			} else {
-				exactValue := bson.M{"tags.key": tag.Key, "tags.value": tag.Value}
-				// exactValue := bson.D{tagObjectExactKey, tagObjectExactValue}
+				exactValue := bson.D{
+					bson.E{Key: "tags.key", Value: tag.Key},
+					bson.E{Key: "tags.value", Value: tag.Value},
+				}
 				mapper = append(mapper, exactValue)
 				continue
 			}
 		}
 		if tag.Min != "" && tag.Value == "" {
-			minValue := bson.M{"tags.key": tag.Key, "tags.value": bson.E{Key: "$gte", Value: tag.Min}}
-			// tagObjectMinValue := bson.E{
-			// 	Key: "tags.value",
-			// 	Value: bson.E{
-			// 		Key:   "$gte",
-			// 		Value: tag.Min,
-			// 	},
-			// }
-			// minValue := bson.D{tagObjectMinKey, tagObjectMinValue}
+			minValue := bson.D{
+				bson.E{
+					Key:   "tags.key",
+					Value: tag.Key,
+				},
+				bson.E{
+					Key: "tags.value",
+					Value: bson.D{
+						bson.E{
+							Key:   "$gte",
+							Value: tag.Min,
+						},
+					},
+				},
+			}
 			mapper = append(mapper, minValue)
 		}
 		if tag.Max != "" && tag.Value == "" {
-			// tagObjectMaxKey := bson.E{
-			// 	Key:   "tags.key",
-			// 	Value: tag.Key,
-			// }
-			// tagObjectMaxValue := bson.E{
-			// 	Key: "tags.value",
-			// 	Value: bson.E{
-			// 		Key:   "$lte",
-			// 		Value: tag.Max,
-			// 	},
-			// }
-			maxValue := bson.M{"tags.key": tag.Key, "tags.value": bson.E{Key: "$lte", Value: tag.Max}}
-			// maxValue := bson.D{tagObjectMaxKey, tagObjectMaxValue}
+			maxValue := bson.D{
+				bson.E{
+					Key:   "tags.key",
+					Value: tag.Key,
+				},
+				bson.E{
+					Key: "tags.value",
+					Value: bson.D{
+						bson.E{
+							Key:   "$lte",
+							Value: tag.Max,
+						},
+					},
+				},
+			}
 			mapper = append(mapper, maxValue)
 		}
 	}
 	//if request from auth user another query block will be added to final query builder
 	if filter.UserID != primitive.NilObjectID {
-		userValue := bson.M{"person._id": filter.UserID}
+		userValue := bson.D{
+			bson.E{
+				Key:   "person._id",
+				Value: filter.UserID,
+			},
+		}
 		mapper = append(mapper, userValue)
 	}
 	// skip := bson.E{
