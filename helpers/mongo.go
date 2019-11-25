@@ -45,6 +45,7 @@ func (service *mongoService) Find(collectionName string, query bson.D) (*mongo.C
 	db := configs.DB().Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
+	// options := options.Find().SetSkip().SetLimit(i int64).SetSort(sort interface{})
 	cursor, err := db.Find(ctx, query)
 	if err != nil {
 		return nil, err

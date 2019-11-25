@@ -127,7 +127,9 @@ func ListOfAdvertises(request echo.Context) (err error) {
 //GetAdvertise controller
 func GetAdvertise(request echo.Context) (err error) {
 	filter := new(models.AdvertiseFilter)
-	filter.UserID = helpers.AuthData(request).UserID
+	if request.Get(models.AuthorizationHeaderKey) != nil {
+		filter.UserID = helpers.AuthData(request).UserID
+	}
 	objectID, err := primitive.ObjectIDFromHex(request.Param("id"))
 	if err != nil {
 		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1010", "Create ObjectID", err.Error())

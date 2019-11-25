@@ -33,73 +33,88 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 	//TODO move this query builder and use fluent api pattern
 	//build query
 	//TODO change this to raw query because is more clear
-
-	var mapper bson.A
-	for _, tag := range filter.Tags {
-		if (tag.Min != "" && tag.Max != "" && tag.Min == tag.Max) || (tag.Value != "") {
-			if tag.Value == "" {
-				exactValue := bson.D{
-					bson.E{Key: "tags.key", Value: tag.Key},
-					bson.E{Key: "tags.value", Value: tag.Min},
+	var builder bson.D
+	//tags mapper
+	if filter.Tags != nil {
+		var mapper bson.A
+		for _, tag := range filter.Tags {
+			if (tag.Min != "" && tag.Max != "" && tag.Min == tag.Max) || (tag.Value != "") {
+				if tag.Value == "" {
+					exactValue := bson.D{
+						bson.E{Key: "tags.key", Value: tag.Key},
+						bson.E{Key: "tags.value", Value: tag.Min},
+					}
+					mapper = append(mapper, exactValue)
+					continue
+				} else {
+					exactValue := bson.D{
+						bson.E{Key: "tags.key", Value: tag.Key},
+						bson.E{Key: "tags.value", Value: tag.Value},
+					}
+					mapper = append(mapper, exactValue)
+					continue
 				}
-				mapper = append(mapper, exactValue)
-				continue
-			} else {
-				exactValue := bson.D{
-					bson.E{Key: "tags.key", Value: tag.Key},
-					bson.E{Key: "tags.value", Value: tag.Value},
-				}
-				mapper = append(mapper, exactValue)
-				continue
 			}
-		}
-		if tag.Min != "" && tag.Value == "" {
-			minValue := bson.D{
-				bson.E{
-					Key:   "tags.key",
-					Value: tag.Key,
-				},
-				bson.E{
-					Key: "tags.value",
-					Value: bson.D{
-						bson.E{
-							Key:   "$gte",
-							Value: tag.Min,
+			if tag.Min != "" && tag.Value == "" {
+				minValue := bson.D{
+					bson.E{
+						Key:   "tags.key",
+						Value: tag.Key,
+					},
+					bson.E{
+						Key: "tags.value",
+						Value: bson.D{
+							bson.E{
+								Key:   "$gte",
+								Value: tag.Min,
+							},
 						},
 					},
-				},
+				}
+				mapper = append(mapper, minValue)
 			}
-			mapper = append(mapper, minValue)
-		}
-		if tag.Max != "" && tag.Value == "" {
-			maxValue := bson.D{
-				bson.E{
-					Key:   "tags.key",
-					Value: tag.Key,
-				},
-				bson.E{
-					Key: "tags.value",
-					Value: bson.D{
-						bson.E{
-							Key:   "$lte",
-							Value: tag.Max,
+			if tag.Max != "" && tag.Value == "" {
+				maxValue := bson.D{
+					bson.E{
+						Key:   "tags.key",
+						Value: tag.Key,
+					},
+					bson.E{
+						Key: "tags.value",
+						Value: bson.D{
+							bson.E{
+								Key:   "$lte",
+								Value: tag.Max,
+							},
 						},
 					},
+				}
+				mapper = append(mapper, maxValue)
+			}
+		}
+		//if request from auth user another query block will be added to final query builder
+		if filter.UserID != primitive.NilObjectID {
+			userValue := bson.D{
+				bson.E{
+					Key:   "person._id",
+					Value: filter.UserID,
 				},
 			}
-			mapper = append(mapper, maxValue)
+			mapper = append(mapper, userValue)
 		}
-	}
-	//if request from auth user another query block will be added to final query builder
-	if filter.UserID != primitive.NilObjectID {
-		userValue := bson.D{
+		builder = bson.D{bson.E{Key: "$and", Value: mapper}}
+	} else if filter.UserID != primitive.NilObjectID {
+		//if request from auth user another query block will be added to final query builder
+		builder = bson.D{
 			bson.E{
 				Key:   "person._id",
 				Value: filter.UserID,
 			},
 		}
-		mapper = append(mapper, userValue)
+	} else {
+		builder = bson.D{}
 	}
+
 	// skip := bson.E{
 	// 	Key:   "$skip",
 	// 	Value: filter.Page * filter.Limit,
@@ -111,7 +126,6 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 	// queryBuilder = append(queryBuilder, skip, limit)
 	//perform query
 
-	builder := bson.D{bson.E{Key: "$and", Value: mapper}}
 	cursor, err := helpers.Mongo().Find(models.AdvertiseCollection, builder)
 	if err != nil {
 		return nil, err
@@ -133,7 +147,12 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 }
 
 func (service *AdvertiseRepository) FindOne(filter *models.AdvertiseFilter) (advertise *models.Advertise, err error) {
-	query := bson.M{"_id": filter.ID, "person._id": filter.UserID}
+	var query bson.M
+	if filter.UserID != primitive.NilObjectID {
+		query = bson.M{"_id": filter.ID, "person._id": filter.UserID}
+	} else {
+		query = bson.M{"_id": filter.ID}
+	}
 	if err = helpers.Mongo().FindOne(models.AdvertiseCollection, query).Decode(&advertise); err != nil {
 		return nil, err
 	}
