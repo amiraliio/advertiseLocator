@@ -1,3 +1,4 @@
+//Package lang ...
 package lang
 
 var (
