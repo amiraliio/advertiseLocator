@@ -20,13 +20,11 @@ services:
     restart: unless-stopped
     env_file:
       - docker.env
-    volumes:
-      - /data/db:/data/db
     ports:
       - 27017:27017
     networks:
       - advertiseNetwork
-    command: mongod
+    command: mongod --storageEngine wiredTiger --dbpath /data/db
 
 networks:
   advertiseNetwork:
