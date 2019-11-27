@@ -24,7 +24,7 @@ services:
       - 27017:27017
     networks:
       - privateNetwork
-    command: mongod --storageEngine wiredTiger --dbpath /data/db
+    command: mongod --auth --storageEngine wiredTiger --dbpath /data/db
 
 networks:
   privateNetwork:
