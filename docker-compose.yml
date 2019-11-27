@@ -3,7 +3,7 @@ version: "2"
 services:
   app:
     build: .
-    container_name: "vajari"
+    container_name: "application"
     ports:
       - 3479:3479
     restart: unless-stopped
@@ -12,7 +12,7 @@ services:
     depends_on:
       - mongodb
     networks:
-      - advertiseNetwork
+      - privateNetwork
 
   mongodb:
     image: mongo:latest
@@ -23,8 +23,8 @@ services:
     ports:
       - 27017:27017
     networks:
-      - advertiseNetwork
+      - privateNetwork
     command: mongod --storageEngine wiredTiger --dbpath /data/db
 
 networks:
-  advertiseNetwork:
+  privateNetwork:
