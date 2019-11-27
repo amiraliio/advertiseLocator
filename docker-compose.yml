@@ -20,11 +20,6 @@ services:
     restart: unless-stopped
     env_file:
       - docker.env
-    environment:
-      - MONGO_DATE_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
-      - MONGODB_USER=${MONGODB_USER}
-      - MONGODB_PASS=${MONGODB_PASS}
     volumes:
       - /data/db:/data/db
     ports:
