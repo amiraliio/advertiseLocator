@@ -28,3 +28,7 @@ services:
 
 networks:
   privateNetwork:
+
+
+
+    #docker-compose up --build --force-recreate

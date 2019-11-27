@@ -14,6 +14,16 @@ func Start() {
 
 //do what you want in startup in this method
 func register() {
+	loadConfig()
+}
+
+func loadConfig() {
+	viper.SetConfigType("yaml")
+	viper.SetConfigName("config")
+	viper.AddConfigPath(".")
+	if err := viper.ReadInConfig(); err != nil {
+		configs.Server.Logger.Fatal(err)
+	}
 	if len(viper.GetString("APP.KEY")) != 32 {
 		configs.Server.Logger.Fatal("Length of APP_KEY must be 32 byte")
 	}

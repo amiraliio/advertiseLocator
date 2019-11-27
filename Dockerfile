@@ -23,6 +23,9 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /root/
 
+# Copy config file to the build project directory
+COPY --from=builder /app/config.yaml .
+
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/application .
 
@@ -31,12 +34,3 @@ EXPOSE 3479
 
 # Command to run the executable
 CMD ["./application"]
-
-
-
-#Type the following command to build the above image
-#docker build -t application .
-
-
-#Type the following command to run the docker image
-#docker run -d -p 3479:3479 application
