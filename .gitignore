@@ -4,3 +4,4 @@ config.yaml
 gin-bin
 __debug_bin
 docker.env
+.env

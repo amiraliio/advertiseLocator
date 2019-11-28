@@ -12,37 +12,48 @@ services:
     depends_on:
       - mongodb
     networks:
-      - privateNetwork
-
-  mongodb:
-    image: mongo:latest
-    container_name: "mongodb"
-    restart: unless-stopped
-    env_file:
-      - docker.env
-    ports:
-      - 27017:27017
-    networks:
-      - privateNetwork
-    command: mongod --auth --storageEngine wiredTiger --dbpath /data/db
+      - mongoNetwork
+      - nginxNetwork
 
   nginx:
     image: nginx:latest
     container_name: "nginx"
     restart: unless-stopped
+    tty: true
     volumes:
-      - nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx.conf:/etc/nginx/nginx.conf
     ports:
       - 80:80
       - 443:443
     depends_on:
       - app
     networks:
-      - privateNetwork
+      - nginxNetwork
+
+  mongodb:
+    image: mongo:latest
+    container_name: "mongodb"
+    restart: always
+    env_file: .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      # MONGO_INITDB_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      # MONGO_INITDB_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      # MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    # volumes:
+    #   - ./001_users.js:/docker-entrypoint-initdb.d/001_users.js
+    ports:
+      - 27018:27017
+    networks:
+      - mongoNetwork
+    command: mongod --auth --storageEngine wiredTiger --dbpath /data/db
 
 networks:
-  privateNetwork:
+  mongoNetwork:
+  nginxNetwork:
     #start
-    # docker-compose build --force-recreate --no-cache
-    # docker-compose up -d
+    # docker-compose build --no-cache
+    # docker rmi -f $(docker images -f "dangling=true" -q)
+    # docker-compose up --force-recreate
     # docker-compose down
