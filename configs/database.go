@@ -12,7 +12,7 @@ import (
 func config() *mongo.Client {
 	var config string
 	if viper.GetString("DATABASES.MONGO.USERNAME") != "" && viper.GetString("DATABASES.MONGO.PASSWORD") != "" {
-		config = "mongodb://" + viper.GetString("DATABASES.MONGO.USERNAME") + ":" + viper.GetString("DATABASES.MONGO.PASSWORD") + "@" + viper.GetString("DATABASES.MONGO.HOST") + ":" + viper.GetString("DATABASES.MONGO.PORT")
+		config = "mongodb://" + viper.GetString("DATABASES.MONGO.USERNAME") + ":" + viper.GetString("DATABASES.MONGO.PASSWORD") + "@" + viper.GetString("DATABASES.MONGO.HOST") + ":" + viper.GetString("DATABASES.MONGO.PORT") + "/?authSource=" + viper.GetString("DATABASES.MONGO.DATABASE")
 	} else {
 		config = "mongodb://" + viper.GetString("DATABASES.MONGO.HOST") + ":" + viper.GetString("DATABASES.MONGO.PORT")
 	}
