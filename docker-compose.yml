@@ -1,4 +1,4 @@
-version: "2"
+version: "3.7"
 
 services:
   app:
@@ -23,7 +23,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
     ports:
-      - 80:80
+      - 8080:80
       - 443:443
     depends_on:
       - app
@@ -34,17 +34,12 @@ services:
     image: mongo:latest
     container_name: "mongodb"
     restart: always
-    env_file: .env
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-      # MONGO_INITDB_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      # MONGO_INITDB_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-      # MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-    # volumes:
-    #   - ./001_users.js:/docker-entrypoint-initdb.d/001_users.js
+    env_file:
+      - ./docker.env
+    volumes:
+      - ./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
     ports:
-      - 27018:27017
+      - 27017:27017
     networks:
       - mongoNetwork
     command: mongod --auth --storageEngine wiredTiger --dbpath /data/db
