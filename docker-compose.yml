@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  app:
+  application:
     build: .
     container_name: "application"
     ports:
@@ -24,7 +24,7 @@ services:
       - 8080:80
       - 443:443
     depends_on:
-      - app
+      - application
     networks:
       - nginxNetwork
 
