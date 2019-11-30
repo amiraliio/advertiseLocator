@@ -7,8 +7,6 @@ services:
     ports:
       - 3479:3479
     restart: unless-stopped
-    links:
-      - mongodb
     depends_on:
       - mongodb
     networks:
@@ -47,8 +45,3 @@ services:
 networks:
   mongoNetwork:
   nginxNetwork:
-    #start
-    # docker-compose build --no-cache
-    # docker rmi -f $(docker images -f "dangling=true" -q)
-    # docker-compose up --force-recreate
-    # docker-compose down
