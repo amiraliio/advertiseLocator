@@ -25,10 +25,10 @@ require (
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
 	github.com/xdg/stringprep v1.0.0 // indirect
 	go.mongodb.org/mongo-driver v1.1.3
-	golang.org/x/crypto v0.0.0-20191122220453-ac88ee75c92c
+	golang.org/x/crypto v0.0.0-20191128160524-b544559bb6d1
 	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933 // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
-	golang.org/x/sys v0.0.0-20191127021746-63cb32ae39b2 // indirect
+	golang.org/x/sys v0.0.0-20191128015809-6d18c012aee9 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v9 v9.30.2
 	gopkg.in/yaml.v2 v2.2.7 // indirect
