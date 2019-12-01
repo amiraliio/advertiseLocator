@@ -1,22 +1,20 @@
 package helpers
 
 import (
-	"path"
-	"runtime"
+	"github.com/spf13/viper"
 )
 
 func Path(dirName string) string {
-	_, root, _, _ := runtime.Caller(0)
 	switch dirName {
 	case "root":
-		return path.Join(path.Dir(root), "..")
+		return viper.GetString("ROOT_PATH")
 	case "storage":
-		return path.Join(path.Dir(root), "../storage")
+		return viper.GetString("ROOT_PATH") + "/storage"
 	case "temp":
-		return path.Join(path.Dir(root), "../storage/temp")
+		return viper.GetString("ROOT_PATH") + "/storage/temp"
 	case "media":
-		return path.Join(path.Dir(root), "../storage/media")
+		return viper.GetString("ROOT_PATH") + "/storage/media"
 	default:
-		return path.Join(path.Dir(root), "..")
+		return viper.GetString("ROOT_PATH")
 	}
 }

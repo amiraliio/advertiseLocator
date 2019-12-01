@@ -29,8 +29,17 @@ COPY --from=builder /app/config.yaml .
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/application .
 
-# Expose port 3479 to the outside world
-EXPOSE 3479
+# Expose port 3749 to the outside world
+EXPOSE 3749
+
+# Build Args
+ARG STORAGE_DIR=/root/storage
+
+# Create Log Directory
+RUN mkdir -p ${STORAGE_DIR}
+
+# Declare volumes to mount
+VOLUME [${STORAGE_DIR}]
 
 # Command to run the executable
 CMD ["./application"]
