@@ -50,7 +50,7 @@ func UploadMedia(request echo.Context) (err error) {
 	storagePath := helpers.Path("storage")
 	//TODO move this string to helper
 	filePath := "/temp/" + requestedMediaType + "/" + authData.UserID.Hex() + "/" + strconv.Itoa(time.Now().Year()) + "/" + strconv.Itoa(int(time.Now().Month())) + "/" + strconv.Itoa(time.Now().Day()) + "/" + uuid.New().String()
-	fileName := "/" + file.Filename
+	fileName := "/" + strings.ReplaceAll(file.Filename, " ", "_")
 	//TODO move this mkdir to helpers
 	if _, err := os.Stat(storagePath + filePath); os.IsNotExist(err) {
 		if err = os.MkdirAll(storagePath+filePath, 0755); err != nil {
