@@ -80,23 +80,15 @@ func ListOfAdvertises(request echo.Context) (err error) {
 		}
 		filter.EndDate = primitive.NewDateTimeFromTime(endDate)
 	}
-	if request.QueryParam("page") == "" {
-		filter.Page = 1
+	filter.LastIndex = request.QueryParam("lastIndex")
+	if request.QueryParam("count") == "" {
+		filter.Count = 20
 	} else {
-		page, err := strconv.Atoi(request.QueryParam("page"))
+		count, err := strconv.Atoi(request.QueryParam("count"))
 		if err != nil {
-			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1005", "Str Page To Int", err.Error())
+			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1006", "Str count To Int", err.Error())
 		}
-		filter.Page = page
-	}
-	if request.QueryParam("limit") == "" {
-		filter.Limit = 20
-	} else {
-		limit, err := strconv.Atoi(request.QueryParam("limit"))
-		if err != nil {
-			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1006", "Str Limit To Int", err.Error())
-		}
-		filter.Limit = limit
+		filter.Count = count
 	}
 	filter.Sort = request.QueryParam("sort")
 	queryParam := request.QueryParam("query")

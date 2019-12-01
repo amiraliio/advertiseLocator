@@ -11,8 +11,8 @@ type BaseFilter struct {
 	UserID    primitive.ObjectID `json:"userID" bson:"userID"`
 	ID        primitive.ObjectID `json:"id" bson:"_id"`
 	Sort      string             `json:"sort" query:"sort" bson:"sort"`
-	Page      int                `json:"page" query:"page"`
-	Limit     int                `json:"limit" query:"limit"`
+	LastIndex string             `json:"lastIndex" query:"lastIndex" bson:"lastIndex"`
+	Count     int                `json:"count" query:"count" bson:"count"`
 }
 
 //AdvertiseFilter
