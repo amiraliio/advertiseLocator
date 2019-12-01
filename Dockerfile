@@ -29,8 +29,6 @@ COPY --from=builder /app/config.yaml .
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/application .
 
-VOLUME [ "./storage" ]
-
 # Expose port 3479 to the outside world
 EXPOSE 3479
 

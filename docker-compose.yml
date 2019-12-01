@@ -9,6 +9,8 @@ services:
     restart: unless-stopped
     depends_on:
       - mongodb
+    volumes:
+      - ./storage:/root/storage
     networks:
       - mongoNetwork
       - nginxNetwork
