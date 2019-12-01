@@ -14,7 +14,7 @@ services:
       - nginxNetwork
 
   nginx:
-    image: nginx:latest
+    image: nginx:1.17.6
     container_name: "nginx"
     restart: unless-stopped
     tty: true
@@ -29,13 +29,14 @@ services:
       - nginxNetwork
 
   mongodb:
-    image: mongo:latest
+    image: mongo:4.2.1
     container_name: "mongodb"
     restart: always
     env_file:
       - ./docker.env
     volumes:
       - ./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
+      - /data/db
     ports:
       - 27017:27017
     networks:

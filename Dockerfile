@@ -1,5 +1,5 @@
 # Start from the latest golang base image
-FROM golang:latest as builder
+FROM golang:1.13.4 as builder
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o application
 
 ######## Start a new stage from scratch #######
-FROM alpine:latest
+FROM alpine:3.10.3
 
 RUN apk --no-cache add ca-certificates
 
@@ -28,6 +28,8 @@ COPY --from=builder /app/config.yaml .
 
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/application .
+
+VOLUME [ "./storage" ]
 
 # Expose port 3479 to the outside world
 EXPOSE 3479
