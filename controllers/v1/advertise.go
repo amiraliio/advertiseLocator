@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"net/http"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -57,14 +58,13 @@ func AddAdvertise(request echo.Context) error {
 			newTag := new(models.Tag)
 			newTag.Key = tag.Key
 			newTag.Value = tag.Value
-			//TODO move this convention to helper
-			intValue, err := strconv.Atoi(tag.Value)
+			value, dataType, err := helpers.CheckAndReturnNumeric(tag.Value)
 			if err == nil {
-				newTag.NumericValue = intValue
-			} else {
-				floatValue, err := strconv.ParseFloat(tag.Value, 64)
-				if err == nil {
-					newTag.NumericValue = floatValue
+				switch dataType {
+				case reflect.Int:
+					newTag.NumericValue = value
+				case reflect.Float64:
+					newTag.NumericValue = value
 				}
 			}
 			tags = append(tags, newTag)

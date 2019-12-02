@@ -4,6 +4,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"reflect"
 	"time"
 
 	"github.com/amiraliio/advertiselocator/helpers"
@@ -56,40 +57,60 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 				}
 			}
 			if tag.Min != "" && tag.Value == "" {
-				minValue := bson.D{
-					bson.E{
-						Key:   "tags.key",
-						Value: tag.Key,
-					},
-					bson.E{
-						Key: "tags.numericValue",
-						Value: bson.D{
-							bson.E{
-								Key:   "$gte",
-								Value: tag.Min,
+				minValue, minDataType, err := helpers.CheckAndReturnNumeric(tag.Min)
+				if err == nil {
+					var minDataValue interface{}
+					switch minDataType {
+					case reflect.Int:
+						minDataValue = minValue
+					case reflect.Float64:
+						minDataValue = minValue
+					}
+					minValue := bson.D{
+						bson.E{
+							Key:   "tags.key",
+							Value: tag.Key,
+						},
+						bson.E{
+							Key: "tags.numericValue",
+							Value: bson.D{
+								bson.E{
+									Key:   "$gte",
+									Value: minDataValue,
+								},
 							},
 						},
-					},
+					}
+					mapper = append(mapper, minValue)
 				}
-				mapper = append(mapper, minValue)
 			}
 			if tag.Max != "" && tag.Value == "" {
-				maxValue := bson.D{
-					bson.E{
-						Key:   "tags.key",
-						Value: tag.Key,
-					},
-					bson.E{
-						Key: "tags.numericValue",
-						Value: bson.D{
-							bson.E{
-								Key:   "$lte",
-								Value: tag.Max,
+				maxValue, maxDataType, err := helpers.CheckAndReturnNumeric(tag.Max)
+				if err == nil {
+					var maxDataValue interface{}
+					switch maxDataType {
+					case reflect.Int:
+						maxDataValue = maxValue
+					case reflect.Float64:
+						maxDataValue = maxValue
+					}
+					maxValue := bson.D{
+						bson.E{
+							Key:   "tags.key",
+							Value: tag.Key,
+						},
+						bson.E{
+							Key: "tags.numericValue",
+							Value: bson.D{
+								bson.E{
+									Key:   "$lte",
+									Value: maxDataValue,
+								},
 							},
 						},
-					},
+					}
+					mapper = append(mapper, maxValue)
 				}
-				mapper = append(mapper, maxValue)
 			}
 		}
 		//if request from auth user another query block will be added to final query builder
@@ -114,7 +135,6 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 	} else {
 		builder = bson.D{}
 	}
-
 
 	// pagination, sort
 	// skip := bson.E{
