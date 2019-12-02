@@ -36,5 +36,5 @@ type Tag struct {
 	Value        string      `json:"value" bson:"value" validate:"required"`
 	Min          string      `json:"min" bson:"min" validate:"omitempty"`
 	Max          string      `json:"max" bson:"max" validate:"omitempty"`
-	NumericValue interface{} `validate:"omitempty,numeric"`
+	NumericValue interface{} `json:"numericValue" bson:"numericValue" validate:"omitempty,numeric"`
 }

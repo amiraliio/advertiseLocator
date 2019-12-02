@@ -46,12 +46,31 @@ func AddAdvertise(request echo.Context) error {
 	person.ID = helpers.AuthData(request).UserID
 	advertise.Advertiser = person
 	advertise.Location = requestModel.Location
-	advertise.Tags = requestModel.Tags
 	advertise.Radius = requestModel.Radius
 	advertise.Images = requestModel.Images
 	advertise.Title = requestModel.Title
 	advertise.Description = requestModel.Description
 	advertise.Visibility = requestModel.Visibility
+	if requestModel.Tags != nil {
+		var tags []*models.Tag
+		for _, tag := range requestModel.Tags {
+			newTag := new(models.Tag)
+			newTag.Key = tag.Key
+			newTag.Value = tag.Value
+			//TODO move this convention to helper
+			intValue, err := strconv.Atoi(tag.Value)
+			if err == nil {
+				newTag.NumericValue = intValue
+			} else {
+				floatValue, err := strconv.ParseFloat(tag.Value, 64)
+				if err == nil {
+					newTag.NumericValue = floatValue
+				}
+			}
+			tags = append(tags, newTag)
+		}
+		advertise.Tags = tags
+	}
 	result, err := advertiseRepository().InsertAdvertise(advertise)
 	if err != nil {
 		return helpers.ResponseError(request, err, http.StatusNotModified, "CA-1002", "Insert Advertise", err.Error())

@@ -62,7 +62,7 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 						Value: tag.Key,
 					},
 					bson.E{
-						Key: "tags.value",
+						Key: "tags.numericValue",
 						Value: bson.D{
 							bson.E{
 								Key:   "$gte",
@@ -80,7 +80,7 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 						Value: tag.Key,
 					},
 					bson.E{
-						Key: "tags.value",
+						Key: "tags.numericValue",
 						Value: bson.D{
 							bson.E{
 								Key:   "$lte",
