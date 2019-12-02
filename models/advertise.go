@@ -32,8 +32,9 @@ type Advertise struct {
 }
 
 type Tag struct {
-	Key   string `json:"key" bson:"key" validate:"required,min=1,max=100"`
-	Value string `json:"value" bson:"value" validate:"required,min=1,max=1000"`
-	Min   string `json:"min" bson:"min" validate:"omitempty,min=1,max=100"`
-	Max   string `json:"max" bson:"max" validate:"omitempty,min=1,max=100"`
+	Key          string      `json:"key" bson:"key" validate:"required,min=1,max=100"`
+	Value        string      `json:"value" bson:"value" validate:"required"`
+	Min          string      `json:"min" bson:"min" validate:"omitempty"`
+	Max          string      `json:"max" bson:"max" validate:"omitempty"`
+	NumericValue interface{} `validate:"omitempty,numeric"`
 }
