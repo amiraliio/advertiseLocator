@@ -6,7 +6,7 @@ APP:
     DEBUG: true
     LOGGER: true
     SHOW_ROUTES: false
-    ROOT_PATH: . #this var will be overide in the main accroding to the project root directory
+    ROOT_PATH: . #this variable will be override in the startup according to the project root directory
 
 AUTH:
     CLIENT_TOKEN_EXPIRE_DAY: 60 #day
@@ -21,7 +21,7 @@ MEDIA:
 
 DATABASES:
     MONGO:
-        HOST: mongodb
+        HOST: mongodb #add your local mongo ip or add mongodb container name as "mongodb" if your are using docker
         PORT: 27017
         USERNAME:
         PASSWORD:

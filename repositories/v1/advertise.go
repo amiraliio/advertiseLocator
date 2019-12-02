@@ -116,7 +116,7 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 	}
 
 
-	//pagination, sort, with date
+	// pagination, sort
 	// skip := bson.E{
 	// 	Key:   "$skip",
 	// 	Value: filter.Page * filter.Limit,
@@ -125,7 +125,6 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 	// 	Key:   "$limit",
 	// 	Value: filter.Limit,
 	// }
-	// queryBuilder = append(queryBuilder, skip, limit)
 	//perform query
 	cursor, err := helpers.Mongo().Find(models.AdvertiseCollection, builder)
 	if err != nil {

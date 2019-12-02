@@ -6,13 +6,13 @@ import (
 
 //BaseFilter filter
 type BaseFilter struct {
-	StartDate primitive.DateTime `json:"startDate" query:"startdate" bson:"startdate"`
-	EndDate   primitive.DateTime `json:"endDate" query:"endDate" bson:"endDate"`
 	UserID    primitive.ObjectID `json:"userID" bson:"userID"`
 	ID        primitive.ObjectID `json:"id" bson:"_id"`
 	Sort      string             `json:"sort" query:"sort" bson:"sort"`
 	LastIndex string             `json:"lastIndex" query:"lastIndex" bson:"lastIndex"`
-	Count     int                `json:"count" query:"count" bson:"count"`
+	Page      int                `json:"page" query:"page" bson:"page"`
+	Limit     int                `json:"limit" query:"limit" bson:"limit"`
+	NextPage  int                `json:"nextPage" query:"nextPage" bson:"nextPage"`
 }
 
 //AdvertiseFilter

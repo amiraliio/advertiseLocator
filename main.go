@@ -8,7 +8,7 @@ import (
 func main() {
 	root, err := os.Getwd()
 	if err != nil {
-		panic("cannot get root path")
+		panic("cannot resolve root path")
 	}
 	app.Start(root)
 }

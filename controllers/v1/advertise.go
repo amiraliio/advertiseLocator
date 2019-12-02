@@ -66,29 +66,23 @@ func ListOfAdvertises(request echo.Context) (err error) {
 	if request.Get(models.AuthorizationHeaderKey) != nil {
 		filter.UserID = helpers.AuthData(request).UserID
 	}
-	if request.QueryParam("startDate") != "" {
-		startDate, err := helpers.ParsDateTime(request.QueryParam("startDate"))
-		if err != nil {
-			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1003", "Parse StartDate", err.Error())
-		}
-		filter.StartDate = primitive.NewDateTimeFromTime(startDate)
-	}
-	if request.QueryParam("endDate") != "" {
-		endDate, err := helpers.ParsDateTime(request.QueryParam("endDate"))
-		if err != nil {
-			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1004", "Parse EndDate", err.Error())
-		}
-		filter.EndDate = primitive.NewDateTimeFromTime(endDate)
-	}
-	filter.LastIndex = request.QueryParam("lastIndex")
-	if request.QueryParam("count") == "" {
-		filter.Count = 20
+	if request.QueryParam("page") == "" {
+		filter.Page = 1
 	} else {
-		count, err := strconv.Atoi(request.QueryParam("count"))
+		page, err := strconv.Atoi(request.QueryParam("page"))
 		if err != nil {
-			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1006", "Str count To Int", err.Error())
+			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1005", "Str Page To Int", err.Error())
 		}
-		filter.Count = count
+		filter.Page = page
+	}
+	if request.QueryParam("limit") == "" {
+		filter.Limit = 50
+	} else {
+		limit, err := strconv.Atoi(request.QueryParam("limit"))
+		if err != nil {
+			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1006", "Str Limit To Int", err.Error())
+		}
+		filter.Limit = limit
 	}
 	filter.Sort = request.QueryParam("sort")
 	queryParam := request.QueryParam("query")
