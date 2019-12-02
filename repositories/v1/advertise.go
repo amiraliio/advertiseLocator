@@ -78,6 +78,14 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 									Key:   "$gte",
 									Value: minDataValue,
 								},
+								bson.E{
+									Key:   "$type",
+									Value: "number",
+								},
+								bson.E{
+									Key:   "$ne",
+									Value: bson.TypeNull,
+								},
 							},
 						},
 					}
@@ -105,6 +113,14 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 								bson.E{
 									Key:   "$lte",
 									Value: maxDataValue,
+								},
+								bson.E{
+									Key:   "$type",
+									Value: "number",
+								},
+								bson.E{
+									Key:   "$ne",
+									Value: bson.TypeNull,
 								},
 							},
 						},
