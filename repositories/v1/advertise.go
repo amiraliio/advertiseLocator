@@ -42,15 +42,25 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 			if (tag.Min != "" && tag.Max != "" && tag.Min == tag.Max) || (tag.Value != "") {
 				if tag.Value == "" {
 					exactValue := bson.D{
-						bson.E{Key: "tags.key", Value: tag.Key},
-						bson.E{Key: "tags.value", Value: tag.Min},
+						bson.E{
+							Key: "$elemMatch",
+							Value: bson.D{
+								bson.E{Key: "key", Value: tag.Key},
+								bson.E{Key: "value", Value: tag.Min},
+							},
+						},
 					}
 					mapper = append(mapper, exactValue)
 					continue
 				} else {
 					exactValue := bson.D{
-						bson.E{Key: "tags.key", Value: tag.Key},
-						bson.E{Key: "tags.value", Value: tag.Value},
+						bson.E{
+							Key: "$elemMatch",
+							Value: bson.D{
+								bson.E{Key: "key", Value: tag.Key},
+								bson.E{Key: "value", Value: tag.Value},
+							},
+						},
 					}
 					mapper = append(mapper, exactValue)
 					continue
@@ -68,23 +78,28 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 					}
 					minValue := bson.D{
 						bson.E{
-							Key:   "tags.key",
-							Value: tag.Key,
-						},
-						bson.E{
-							Key: "tags.numericValue",
+							Key: "$elemMatch",
 							Value: bson.D{
 								bson.E{
-									Key:   "$gte",
-									Value: minDataValue,
+									Key:   "key",
+									Value: tag.Key,
 								},
 								bson.E{
-									Key:   "$type",
-									Value: "number",
-								},
-								bson.E{
-									Key:   "$ne",
-									Value: bson.TypeNull,
+									Key: "numericValue",
+									Value: bson.D{
+										bson.E{
+											Key:   "$gte",
+											Value: minDataValue,
+										},
+										bson.E{
+											Key:   "$type",
+											Value: "number",
+										},
+										bson.E{
+											Key:   "$ne",
+											Value: bson.TypeNull,
+										},
+									},
 								},
 							},
 						},
@@ -104,23 +119,28 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 					}
 					maxValue := bson.D{
 						bson.E{
-							Key:   "tags.key",
-							Value: tag.Key,
-						},
-						bson.E{
-							Key: "tags.numericValue",
+							Key: "$elemMatch",
 							Value: bson.D{
 								bson.E{
-									Key:   "$lte",
-									Value: maxDataValue,
+									Key:   "key",
+									Value: tag.Key,
 								},
 								bson.E{
-									Key:   "$type",
-									Value: "number",
-								},
-								bson.E{
-									Key:   "$ne",
-									Value: bson.TypeNull,
+									Key: "numericValue",
+									Value: bson.D{
+										bson.E{
+											Key:   "$lte",
+											Value: maxDataValue,
+										},
+										bson.E{
+											Key:   "$type",
+											Value: "number",
+										},
+										bson.E{
+											Key:   "$ne",
+											Value: bson.TypeNull,
+										},
+									},
 								},
 							},
 						},
@@ -131,15 +151,14 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 		}
 		//if request from auth user another query block will be added to final query builder
 		if filter.UserID != primitive.NilObjectID {
-			userValue := bson.D{
-				bson.E{
-					Key:   "person._id",
-					Value: filter.UserID,
-				},
+			userValue := bson.E{
+				Key:   "person._id",
+				Value: filter.UserID,
 			}
-			mapper = append(mapper, userValue)
+			builder = bson.D{userValue, bson.E{Key: "tags", Value: bson.E{Key: "$all", Value: mapper}}}
+		} else {
+			builder = bson.D{bson.E{Key: "tags", Value: bson.E{Key: "$all", Value: mapper}}}
 		}
-		builder = bson.D{bson.E{Key: "$and", Value: mapper}}
 	} else if filter.UserID != primitive.NilObjectID {
 		//if request from auth user another query block will be added to final query builder
 		builder = bson.D{
