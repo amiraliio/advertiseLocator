@@ -18,13 +18,13 @@ func ConvertByte(byteNumber int64, convertTo string) (uint64, error) {
 }
 
 func CheckAndReturnNumeric(value string) (response interface{}, dataType reflect.Kind, err error) {
-	intValue, err := strconv.Atoi(value)
+	floatValue, err := strconv.ParseFloat(value, 64)
 	if err == nil {
-		return intValue, reflect.Int, nil
+		return floatValue, reflect.Float64, nil
 	} else {
-		floatValue, err := strconv.ParseFloat(value, 64)
+		intValue, err := strconv.Atoi(value)
 		if err == nil {
-			return floatValue, reflect.Float64, nil
+			return intValue, reflect.Int, nil
 		}
 	}
 	return nil, 0, errors.New("the string isn't numeric")
