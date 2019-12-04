@@ -62,9 +62,9 @@ func AddAdvertise(request echo.Context) error {
 			if err == nil {
 				switch dataType {
 				case reflect.Int:
-					newTag.NumericValue = value
+					newTag.NumericValue = value.(int)
 				case reflect.Float64:
-					newTag.NumericValue = value
+					newTag.NumericValue = value.(float64)
 				}
 			}
 			tags = append(tags, newTag)

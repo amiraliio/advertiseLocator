@@ -51,7 +51,6 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 						},
 					}
 					mapper = append(mapper, exactValue)
-					continue
 				} else {
 					exactValue := bson.D{
 						bson.E{
@@ -63,7 +62,6 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 						},
 					}
 					mapper = append(mapper, exactValue)
-					continue
 				}
 			}
 			if tag.Min != "" && tag.Value == "" {
@@ -72,9 +70,9 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 					var minDataValue interface{}
 					switch minDataType {
 					case reflect.Int:
-						minDataValue = minValue
+						minDataValue = minValue.(int)
 					case reflect.Float64:
-						minDataValue = minValue
+						minDataValue = minValue.(float64)
 					}
 					minValue := bson.D{
 						bson.E{
@@ -113,9 +111,9 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 					var maxDataValue interface{}
 					switch maxDataType {
 					case reflect.Int:
-						maxDataValue = maxValue
+						maxDataValue = maxValue.(int)
 					case reflect.Float64:
-						maxDataValue = maxValue
+						maxDataValue = maxValue.(float64)
 					}
 					maxValue := bson.D{
 						bson.E{
@@ -155,9 +153,9 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 				Key:   "person._id",
 				Value: filter.UserID,
 			}
-			builder = bson.D{userValue, bson.E{Key: "tags", Value: bson.E{Key: "$all", Value: mapper}}}
+			builder = bson.D{userValue, bson.E{Key: "tags", Value: bson.D{bson.E{Key: "$all", Value: mapper}}}}
 		} else {
-			builder = bson.D{bson.E{Key: "tags", Value: bson.E{Key: "$all", Value: mapper}}}
+			builder = bson.D{bson.E{Key: "tags", Value: bson.D{bson.E{Key: "$all", Value: mapper}}}}
 		}
 	} else if filter.UserID != primitive.NilObjectID {
 		//if request from auth user another query block will be added to final query builder
