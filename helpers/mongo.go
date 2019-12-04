@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 
 	"github.com/amiraliio/advertiselocator/configs"
@@ -24,7 +25,7 @@ func Mongo() MongoInterface {
 type MongoInterface interface {
 	InsertOne(collectionName string, object interface{}) (primitive.ObjectID, error)
 	FindOne(collectionName string, query bson.M) *mongo.SingleResult
-	Find(collectionName string, query bson.D) (*mongo.Cursor, error)
+	Find(collectionName string, query bson.D, option *options.FindOptions) (*mongo.Cursor, error)
 	Aggregate(collectionName string, query bson.D) (*mongo.Cursor, error)
 	FindOneAndUpdate(collectionName string, filter bson.D, update bson.D) *mongo.SingleResult
 	DeleteOne(collectionName string, filter bson.M) (deleteResult *mongo.DeleteResult, err error)
@@ -41,12 +42,11 @@ func (service *mongoService) FindOne(collectionName string, query bson.M) *mongo
 }
 
 //Find helper
-func (service *mongoService) Find(collectionName string, query bson.D) (*mongo.Cursor, error) {
+func (service *mongoService) Find(collectionName string, query bson.D, option *options.FindOptions) (*mongo.Cursor, error) {
 	db := configs.DB().Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()   
-	// options := options.Find().SetSkip().SetLimit(i int64).SetSort(sort interface{})
-	cursor, err := db.Find(ctx, query)
+	defer cancel()
+	cursor, err := db.Find(ctx, query, option)
 	if err != nil {
 		return nil, err
 	}

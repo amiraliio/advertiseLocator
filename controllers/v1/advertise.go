@@ -88,7 +88,7 @@ func ListOfAdvertises(request echo.Context) (err error) {
 	if request.QueryParam("page") == "" {
 		filter.Page = 1
 	} else {
-		page, err := strconv.Atoi(request.QueryParam("page"))
+		page, err := strconv.ParseInt(request.QueryParam("page"), 10, 64)
 		if err != nil {
 			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1005", "Str Page To Int", err.Error())
 		}
@@ -97,7 +97,7 @@ func ListOfAdvertises(request echo.Context) (err error) {
 	if request.QueryParam("limit") == "" {
 		filter.Limit = 50
 	} else {
-		limit, err := strconv.Atoi(request.QueryParam("limit"))
+		limit, err := strconv.ParseInt(request.QueryParam("limit"), 10, 64)
 		if err != nil {
 			return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1006", "Str Limit To Int", err.Error())
 		}

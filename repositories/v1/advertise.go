@@ -4,7 +4,9 @@ package repositories
 import (
 	"context"
 	"errors"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/amiraliio/advertiselocator/helpers"
@@ -168,18 +170,29 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 	} else {
 		builder = bson.D{}
 	}
-
-	// pagination, sort
-	// skip := bson.E{
-	// 	Key:   "$skip",
-	// 	Value: filter.Page * filter.Limit,
-	// }
-	// limit := bson.E{
-	// 	Key:   "$limit",
-	// 	Value: filter.Limit,
-	// }
 	//perform query
-	cursor, err := helpers.Mongo().Find(models.AdvertiseCollection, builder)
+	var option *options.FindOptions
+	var skip int64
+	if filter.Page > 0 {
+		skip = (filter.Page - 1) * (filter.Limit)
+	} else {
+		skip = 0
+	}
+	if filter.Sort != "" {
+		var sortKey string
+		var sortValue int
+		if strings.HasPrefix(filter.Sort, "-") {
+			sortKey = strings.TrimPrefix(filter.Sort, "-")
+			sortValue = -1
+		} else {
+			sortValue = 1
+			sortKey = filter.Sort
+		}
+		option = options.Find().SetSkip(skip).SetLimit(filter.Limit).SetSort(bson.M{sortKey: sortValue})
+	} else {
+		option = options.Find().SetSkip(skip).SetLimit(filter.Limit)
+	}
+	cursor, err := helpers.Mongo().Find(models.AdvertiseCollection, builder, option)
 	if err != nil {
 		return nil, err
 	}
