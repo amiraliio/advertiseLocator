@@ -53,7 +53,7 @@ func userAccess(next echo.HandlerFunc, userType string) echo.HandlerFunc {
 	return func(request echo.Context) error {
 		auth := request.Request().Header.Get(models.AuthorizationHeaderKey)
 		if auth == "" {
-			return next(request)
+			return helpers.ResponseError(request, nil, http.StatusUnauthorized, "MA-1004", helpers.AccessTarget, "Access denied")
 		}
 		data, err := helpers.DecodeToken(auth)
 		if err != nil {
@@ -63,13 +63,13 @@ func userAccess(next echo.HandlerFunc, userType string) echo.HandlerFunc {
 			return helpers.ResponseError(request, nil, http.StatusUnauthorized, "MA-1006", helpers.AccessTarget, "Access denied")
 		}
 		if data.CreatedAt < primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, -viper.GetInt("AUTH.CLIENT_TOKEN_EXPIRE_DAY"))) {
-			return helpers.ResponseError(request, nil, http.StatusUnauthorized, "MA-1008", helpers.AccessTarget, "Token expired")
+			return helpers.ResponseError(request, nil, http.StatusUnauthorized, "MA-1007", helpers.AccessTarget, "Token expired")
 		}
 		client := new(models.Client)
 		client.CreatedAt = data.CreatedAt
 		objectID, err := primitive.ObjectIDFromHex(data.Key)
 		if err != nil {
-			return helpers.ResponseError(request, err, http.StatusBadRequest, "MA-1007", "Create ObjectID", err.Error())
+			return helpers.ResponseError(request, err, http.StatusBadRequest, "MA-1008", "Create ObjectID", err.Error())
 		}
 		client.UserID = objectID
 		request.Set(models.AuthorizationHeaderKey, client)
@@ -78,7 +78,7 @@ func userAccess(next echo.HandlerFunc, userType string) echo.HandlerFunc {
 }
 
 func PublicAccess(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(request echo.Context) error{
+	return func(request echo.Context) error {
 		return next(request)
 	}
 }

@@ -170,7 +170,7 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 	} else {
 		builder = bson.D{}
 	}
-	//perform query
+	//perform sort and pagination
 	var option *options.FindOptions
 	var skip int64
 	if filter.Page > 0 {
@@ -192,6 +192,7 @@ func (service *AdvertiseRepository) ListOfAdvertise(filter *models.AdvertiseFilt
 	} else {
 		option = options.Find().SetSkip(skip).SetLimit(filter.Limit)
 	}
+	//perform query
 	cursor, err := helpers.Mongo().Find(models.AdvertiseCollection, builder, option)
 	if err != nil {
 		return nil, err

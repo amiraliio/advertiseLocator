@@ -12,6 +12,7 @@ var (
 	apiV1       *echo.Group = configs.Server.Group("/api/v1")
 	auth        *echo.Group = apiV1.Group("/auth", middleware.CheckAPIKey)
 	advertise   *echo.Group = apiV1.Group("/advertises", middleware.CheckAPIKey)
+	person      *echo.Group = apiV1.Group("/person", middleware.CheckAPIKey)
 	media       *echo.Group = apiV1.Group("/media", middleware.CheckAPIKey)
 	publicMedia *echo.Group = configs.Server.Group("/media", middleware.CheckAPIKey)
 )
@@ -27,10 +28,14 @@ func API() {
 
 	//advertise crud for person
 	advertise.POST("", controllers.AddAdvertise, middleware.CheckIsPerson).Name = "api-v1-add-advertise"
-	advertise.GET("", controllers.ListOfAdvertises, middleware.CheckIsPerson, middleware.PublicAccess).Name = "api-v1-list-advertise"
+	advertise.GET("", controllers.ListOfAdvertises, middleware.PublicAccess).Name = "api-v1-list-advertise"
 	advertise.GET("/:id", controllers.GetAdvertise, middleware.CheckIsPerson).Name = "api-v1-get-advertise"
 	advertise.DELETE("/:id", controllers.DeleteAdvertise, middleware.CheckIsPerson).Name = "api-v1-delete-advertise"
 	// advertise.PUT("/:id", controllers.UpdateAdvertise, middleware.CheckIsPerson).Name = "api-v1-update-advertise"
+
+	//person specific API's
+	person.GET("/:personID/advertises", controllers.PersonListOfAdvertises, middleware.CheckIsPerson).Name = "api-v1-person-list-advertise"
+	//TODO update profile
 
 	//media crud
 	media.POST("/:mediaType/upload", controllers.UploadMedia, middleware.CheckIsPerson)

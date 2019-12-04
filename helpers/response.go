@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/amiraliio/advertiselocator/configs"
@@ -29,10 +28,10 @@ type ResponseModel struct {
 }
 
 type PaginationModel struct {
-	Page      int `json:"page"`
-	Limit     int `json:"limit"`
-	LastIndex int `json:"lastIndex"`
-	Total     int `json:"total"`
+	Page  int `json:"page"`
+	Limit int `json:"limit"`
+	// LastIndex int `json:"lastIndex"`
+	// Total     int `json:"total"`
 }
 
 //ErrorMessage model
@@ -74,6 +73,7 @@ func httpTarget(httpCode int, requestMethod string) string {
 	}
 }
 
+//TODO change this function to receive struct as response error data model
 //ErrorResponse helper
 func ResponseError(request echo.Context, err error, httpCode int, internalCode, detailTarget, detailMessage string) error {
 	errorMessage := new(ErrorModel)
@@ -109,11 +109,8 @@ func ResponseOk(request echo.Context, httpCode int, data interface{}) error {
 	response.Success = true
 	response.Error = nil
 	response.Data = data
-	pagination := new(PaginationModel)
-	page, _ := strconv.Atoi(request.QueryParam("page"))
-	pagination.Page = page
-	limit, _ := strconv.Atoi(request.QueryParam("limit"))
-	pagination.Limit = limit
-	pagination.Total = pagination.Page * pagination.Limit
+	if request.Get("pagination") != "" && IsInstance(request.Get("pagination"), (*PaginationModel)(nil)) {
+		response.Pagination = request.Get("pagination").(*PaginationModel)
+	}
 	return request.JSONPretty(httpCode, response, "	")
 }

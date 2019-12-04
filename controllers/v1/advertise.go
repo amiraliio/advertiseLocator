@@ -11,7 +11,6 @@ import (
 
 	"github.com/amiraliio/advertiselocator/helpers"
 	"github.com/amiraliio/advertiselocator/models"
-	"github.com/amiraliio/advertiselocator/repositories/v1"
 	"github.com/amiraliio/advertiselocator/requests"
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -23,10 +22,6 @@ import (
 
 //Notice: this controller detail error code start with CA which is abbreviation for Controller Advertise
 //so each go file has their own unique code prefix, which implemented by responsibility + entity name
-
-func advertiseRepository() repositories.AdvertiseInterface {
-	return new(repositories.AdvertiseRepository)
-}
 
 //AddAdvertise controller
 func AddAdvertise(request echo.Context) error {
@@ -126,6 +121,20 @@ func ListOfAdvertises(request echo.Context) (err error) {
 	if err != nil {
 		return helpers.ResponseError(request, err, http.StatusBadRequest, "CA-1009", "List Of Advertise", err.Error())
 	}
+	pagination := new(helpers.PaginationModel)
+	if request.QueryParam("page") != "" {
+		page, _ := strconv.Atoi(request.QueryParam("page"))
+		pagination.Page = page
+	} else {
+		pagination.Page = 1
+	}
+	if request.QueryParam("limit") != "" {
+		limit, _ := strconv.Atoi(request.QueryParam("limit"))
+		pagination.Limit = limit
+	} else {
+		pagination.Limit = 50
+	}
+	request.Set("pagination", pagination)
 	return helpers.ResponseOk(request, http.StatusOK, results)
 }
 
